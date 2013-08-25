@@ -1,5 +1,7 @@
 #Zipper
 
+[![Build Status](https://travis-ci.org/Chumper/Zipper.png)](https://travis-ci.org/Chumper/Zipper)
+
 This is a simple Wrapper around the ZipArchive methods with some handy functions.
 
 ##Installation
@@ -33,6 +35,19 @@ You can then access Zipper with the `Zipper` alias.
     $zipper->getFileContent('mySuperPackage/composer.json');
 	
     $zipper->make('test.zip')->extractTo('',array('mySuperPackage/composer.json'),Zipper::WHITELIST);
+    
+You can easily chain most functions, functions that are not chainable are `getFileContent`, `close`, `extractTo` and `getStatus`
+
+The main reason i wrote this little package is the `extractTo` method since it allows you to be very flexible when extracting zips.
+So you can for example implement an update method which will just override the changed files.
+
+	$zipper->make('test.zip')->extractTo('public', array('vendor'), Zipper::BLACKLIST);
+	
+This will extract the `test.zip` into the `public` folder except the folder `vendor` inside the zip will not be extracted.
+
+	$zipper->make('test.zip')->extractTo('public', array('vendor'), Zipper::WHITELIST);
+	
+This will extract the `test.zip` into the `public` folder but **only** the folder `vendor` inside the zip will be extracted.
 
 ##Functions
 
