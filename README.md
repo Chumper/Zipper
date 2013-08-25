@@ -49,6 +49,11 @@ This will extract the `test.zip` into the `public` folder except the folder `ven
 	
 This will extract the `test.zip` into the `public` folder but **only** the folder `vendor` inside the zip will be extracted.
 
+	$zipper->make('test.zip')->folder('test')->extractTo('foo');
+	
+This will go into the folder `test` in the zip file and extract the content of the folder to the folder `foo`.
+This command is really nice to get just a part of the zip file.
+
 ##Functions
 
 **make($pathToFile)**
