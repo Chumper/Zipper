@@ -13,7 +13,7 @@
         "illuminate/filesystem": "4.0.x"
     },
     "require-dev": {
-      "phpunit/phpunit": "dev-master",
+      "phpunit/phpunit": "3.7.*",
       "mockery/mockery": "dev-master"
     },
     "autoload": {
