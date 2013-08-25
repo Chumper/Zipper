@@ -1,10 +1,16 @@
 {
     "name": "chumper/zipper",
-    "description": "",
+    "type": "library",
+    "description": "This is a little neat helper for the ZipArchive methods with handy functions",
+    "keywords": ["laravel","ZIP","Archive"],
+    "homepage": "http://github.com/Seldaek/monolog",
+    "license": "Apache2",
     "authors": [
         {
             "name": "Nils Plaschke",
-            "email": "github@nilsplaschke.de"
+            "email": "github@nilsplaschke.de",
+            "homepage": "http://nilsplaschke.de",
+            "role": "Developer"
         }
     ],
     "require": {
