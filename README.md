@@ -2,13 +2,19 @@
 
 This is a simple Wrapper around the ZipArchive methods with some handy functions.
 
-> This package includes Laravel 4 support, to activate it add
+##Installation
 
-> `Chumper\Zipper\ZipperServiceProvider`
+To install this package just require it in your `composer.json` with
 
-> to the service providers in the `app.php`
+	"Chumper/Zipper": "dev-master"
 
-> You can then access Zipper with the `Zipper` alias.
+This package also includes Laravel 4 support, to activate it add
+
+	'Chumper\Zipper\ZipperServiceProvider'
+
+to the service providers in the `app.php`
+
+You can then access Zipper with the `Zipper` alias.
 
 ##Simple example
 
