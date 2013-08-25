@@ -56,10 +56,9 @@ class ZipperTest extends PHPUnit_Framework_TestCase {
 
     public function testAddDir()
     {
-        $zipper = new \Chumper\Zipper\Zipper;
+        //$zipper = new \Chumper\Zipper\Zipper;
         //$zipper->make('test.zip')->add('composer.json','test')->close();
-        $content = $zipper->make('test.zip')->getFileContent('test/composer.json');
-        dd($content);
+        //$zipper->make('test.zip')->remove('composer.lock')->close();
     }
 
     protected function tearDown()
