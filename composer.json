@@ -1,0 +1,25 @@
+{
+    "name": "chumper/zipper",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nils Plaschke",
+            "email": "github@nilsplaschke.de"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x",
+        "illuminate/filesystem": "4.0.x"
+    },
+    "require-dev": {
+      "phpunit/phpunit": "dev-master",
+      "mockery/mockery": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Chumper\\Zipper": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
