@@ -44,6 +44,11 @@ class Zipper {
     private $zip;
 
     /**
+     * @var string The path to the current zip file
+     */
+    private $filePath;
+
+    /**
      * Constructor
      *
      * @param Filesystem $fs
@@ -184,6 +189,7 @@ class Zipper {
     public function close()
     {
         @$this->zip->close();
+        $this->filePath = "";
     }
 
     /**
@@ -207,6 +213,15 @@ class Zipper {
     {
         $this->currentFolder = '';
         return $this;
+    }
+
+    /**
+     *
+     */
+    public function delete(){
+        @$this->zip->close();
+        $this->file->delete($this->filePath);
+        $this->filePath = "";
     }
 
     /**
@@ -249,6 +264,8 @@ class Zipper {
             $this->status = $this->zip->open($pathToFile, ZipArchive::CREATE);
         else
             $this->status = $this->zip->open($pathToFile);
+
+        $this->filePath = $pathToFile;
     }
 
     /**
