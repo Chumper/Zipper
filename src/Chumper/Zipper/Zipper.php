@@ -150,7 +150,7 @@ class Zipper {
      */
     public function getStatus()
     {
-        return $this->status;
+        return $this->zip->getStatusString();
     }
 
     /**
@@ -181,6 +181,15 @@ class Zipper {
             $this->zip->deleteName($fileToRemove);
 
         return $this;
+    }
+
+    /**
+     * Returns the path of the current zip file if there is one.
+     * @return string The path to the file
+     */
+    public function getFilePath()
+    {
+        return $this->filePath;
     }
 
     /**
@@ -302,12 +311,23 @@ class Zipper {
      */
     private function extractWithBlackList($path, $filesArray)
     {
+
         for($i=0; $i<$this->zip->numFiles; $i++)
         {
+            //check if folder
+            $stats = $this->zip->statIndex($i);
+            if($stats['size'] == 0 && $stats['crc'] == 0)
+                continue;
+
             $fileName = $this->zip->getNameIndex($i);
 
             if(!empty($this->currentFolder) && !starts_with($fileName,$this->currentFolder))
                 continue;
+
+            if(!empty($this->currentFolder))
+            {
+                $fileName = str_replace($this->currentFolder.'/','',$fileName);
+            }
 
             if(starts_with($fileName,$filesArray))
             {
@@ -337,11 +357,18 @@ class Zipper {
     {
         for($i=0; $i<$this->zip->numFiles; $i++)
         {
+            //check if folder
+            $stats = $this->zip->statIndex($i);
+            if($stats['size'] == 0 && $stats['crc'] == 0)
+                continue;
+
+
             $fileName = $this->zip->getNameIndex($i);
 
             if(!empty($this->currentFolder) && !starts_with($fileName,$this->currentFolder))
                 continue;
 
+            dd($fileName,$filesArray);
             if(starts_with($fileName,$filesArray))
             {
                 //get right filename
