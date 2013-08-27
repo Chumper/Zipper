@@ -320,6 +320,7 @@ class Zipper {
                 continue;
 
             $fileName = $this->zip->getNameIndex($i);
+            $oriName = $fileName;
 
             if(!empty($this->currentFolder) && !starts_with($fileName,$this->currentFolder))
                 continue;
@@ -339,12 +340,12 @@ class Zipper {
             if(!empty($this->currentFolder))
             {
                 $tmpPath = str_replace($this->currentFolder.'/', '', $fileName);
-                $this->file->put($path.'/'.$tmpPath,$this->zip->getStream($fileName));
+                $this->file->put($path.'/'.$tmpPath,$this->zip->getStream($oriName));
             }
             else
-                if(!$this->zip->extractTo($path,$fileName))
+                if(!$this->zip->extractTo($path,$oriName))
                     throw new Exception(sprintf('The file "%s" could not be extracted to "%s"',
-                        $fileName, $path));
+                        $oriName, $path));
         }
     }
 
@@ -362,25 +363,29 @@ class Zipper {
             if($stats['size'] == 0 && $stats['crc'] == 0)
                 continue;
 
-
             $fileName = $this->zip->getNameIndex($i);
+            $oriName = $fileName;
 
             if(!empty($this->currentFolder) && !starts_with($fileName,$this->currentFolder))
                 continue;
 
-            dd($fileName,$filesArray);
+            if(!empty($this->currentFolder))
+            {
+                $fileName = str_replace($this->currentFolder.'/','',$fileName);
+            }
+
             if(starts_with($fileName,$filesArray))
             {
                 //get right filename
                 if(!empty($this->currentFolder))
                 {
                     $tmpPath = str_replace($this->currentFolder.'/', '', $fileName);
-                    $this->file->put($path.'/'.$tmpPath,$this->zip->getStream($fileName));
+                    $this->file->put($path.'/'.$tmpPath,$this->zip->getStream($oriName));
                 }
                 else
-                    if(!$this->zip->extractTo($path,$fileName))
+                    if(!$this->zip->extractTo($path,$oriName))
                         throw new Exception(sprintf('The file "%s" could not be extracted to "%s"',
-                            $fileName, $path));
+                            $oriName, $path));
             }
         }
     }
