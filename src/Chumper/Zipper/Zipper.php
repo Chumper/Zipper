@@ -123,7 +123,7 @@ class Zipper {
      */
     public function add($pathToAdd, $rootDirInZip = NULL)
     {
-        if(!is_null($rootDirInZip))$rootDirInZip = $this->currentFolder;
+        if(is_null($rootDirInZip))$rootDirInZip = $this->currentFolder;
 
         //check if array or string
         if(is_array($pathToAdd))
@@ -298,10 +298,13 @@ class Zipper {
     {
         empty($rootDirInZip) ? $path = false : $path = true;
 
+        $info = pathinfo($pathToAdd);
+        $file_name = $info['filename'].'.'.$info['extension'];
+
         if(!$path)
-            $this->zip->addFile($pathToAdd);
+            $this->zip->addFile($pathToAdd, $file_name);
         else
-            $this->zip->addFile($pathToAdd,$rootDirInZip.'/'.$pathToAdd);
+            $this->zip->addFile($pathToAdd,$rootDirInZip.'/'.$file_name);
     }
 
     /**
