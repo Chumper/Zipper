@@ -39,9 +39,9 @@ class Zipper {
     private $file;
 
     /**
-     * @var ZipArchive Handler to the zip archive
+     * @var Repository Handler to the archive
      */
-    private $zip;
+    private $repository;
 
     /**
      * @var string The path to the current zip file
@@ -52,23 +52,22 @@ class Zipper {
      * Constructor
      *
      * @param Filesystem $fs
-     * @param ZipArchive $zip
      */
-    function __construct(Filesystem $fs = null, ZipArchive $zip = null)
+    function __construct(Filesystem $fs = null)
     {
         $this->file = $fs ? $fs : new Filesystem();
-        $this->zip = $zip ? $zip : new ZipArchive();
     }
 
     /**
-     * Create a new Archive if the file does not exists
-     * opens an archive if the file exists
+     * Create a new zip Archive if the file does not exists
+     * opens a zip archive if the file exists
      *
      * @param $pathToFile string The file to open
      * @return $this Zipper instance
      */
     public function make($pathToFile)
     {
+        $this->repository = new ZipArchive;
         $new = $this->createZipFile($pathToFile);
         $this->openFile($pathToFile, $new);
         return $this;
@@ -248,7 +247,7 @@ class Zipper {
      * @return bool
      * @throws \Exception
      */
-    private function createZipFile($pathToZip){
+    private function createArchiveFile($pathToZip){
 
         if(!$this->file->exists($pathToZip))
         {
