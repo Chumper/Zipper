@@ -9,7 +9,8 @@ use Chumper\Zipper\Repositories\ZipRepository;
  * To change this template use File | Settings | File Templates.
  */
 
-class ZipRepositoryTest extends PHPUnit_Framework_TestCase {
+class ZipRepositoryTest extends PHPUnit_Framework_TestCase
+{
 
     /**
      * @var ZipRepository
@@ -24,18 +25,18 @@ class ZipRepositoryTest extends PHPUnit_Framework_TestCase {
     public function setUp()
     {
         $this->mock = Mockery::mock(new ZipArchive);
-        $this->zip = new ZipRepository('foo',$this->mock);
+        $this->zip = new ZipRepository('foo', $this->mock);
     }
 
     public function testAddFile()
     {
-        $this->mock->shouldReceive('addFile')->once()->with('bar','bar');
-        $this->mock->shouldReceive('addFile')->once()->with('bar','foo/bar');
-        $this->mock->shouldReceive('addFile')->once()->with('foo/bar','bar');
+        $this->mock->shouldReceive('addFile')->once()->with('bar', 'bar');
+        $this->mock->shouldReceive('addFile')->once()->with('bar', 'foo/bar');
+        $this->mock->shouldReceive('addFile')->once()->with('foo/bar', 'bar');
 
-        $this->zip->addFile('bar','bar');
-        $this->zip->addFile('bar','foo/bar');
-        $this->zip->addFile('foo/bar','bar');
+        $this->zip->addFile('bar', 'bar');
+        $this->zip->addFile('bar', 'foo/bar');
+        $this->zip->addFile('foo/bar', 'bar');
     }
 
     public function testRemoveFile()
@@ -78,6 +79,11 @@ class ZipRepositoryTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($this->zip->fileExists('bar'));
         $this->assertFalse($this->zip->fileExists('foo/bar'));
+    }
+
+    public function testClose()
+    {
+        $this->zip->close();
     }
 
     protected function tearDown()

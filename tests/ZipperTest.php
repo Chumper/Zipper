@@ -145,7 +145,24 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
     public function testExtractBlackList()
     {
+        $this->file->shouldReceive('isFile')->with('foo')
+            ->andReturn(true);
 
+        $this->archive->add('foo');
+
+        $this->file->shouldReceive('put')->with(realpath(NULL) . '/foo', 'foo');
+
+        $this->archive->extractTo('', array(), Zipper::BLACKLIST);
+
+        //----
+        $this->file->shouldReceive('isFile')->with('foo')
+            ->andReturn(true);
+
+        $this->archive->folder('foo/bar')->add('foo');
+
+        $this->file->shouldReceive('put')->with(realpath(NULL) . '/foo', 'foo/bar/foo');
+
+        $this->archive->extractTo('', array('foo'), Zipper::BLACKLIST);
     }
 
     public function testNavigationFolderAndHome()

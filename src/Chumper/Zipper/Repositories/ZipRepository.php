@@ -1,5 +1,6 @@
 <?php namespace Chumper\Zipper\Repositories;
 
+use Exception;
 use ZipArchive;
 
 class ZipRepository implements RepositoryInterface
@@ -11,10 +12,15 @@ class ZipRepository implements RepositoryInterface
      *
      * @param $filePath
      * @param null $archive
+     * @throws \Exception
      * @return \Chumper\Zipper\Repositories\ZipRepository
      */
     function __construct($filePath, $archive = null)
     {
+        //Check if ZipArchive is available
+        if (!class_exists('ZipArchive'))
+            throw new Exception('Error: Your PHP version is not compiled with zip support');
+
         $this->archive = $archive ? $archive : new ZipArchive;
     }
 
@@ -73,7 +79,8 @@ class ZipRepository implements RepositoryInterface
     public function each($callback)
     {
         for ($i = 0; $i < $this->archive->numFiles; $i++) {
-            //check if folder
+
+            //skip if folder
             $stats = $this->archive->statIndex($i);
             if ($stats['size'] == 0 && $stats['crc'] == 0)
                 continue;
@@ -111,6 +118,6 @@ class ZipRepository implements RepositoryInterface
      */
     public function close()
     {
-        // TODO: Implement close() method.
+        $this->archive->close();
     }
 }

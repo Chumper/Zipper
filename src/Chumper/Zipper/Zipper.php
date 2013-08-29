@@ -83,18 +83,36 @@ class Zipper
         return $this;
     }
 
+    /**
+     * Create a new zip archive or open an existing one
+     *
+     * @param $pathToFile
+     * @return $this
+     */
     public function zip($pathToFile)
     {
         $this->make($pathToFile);
         return $this;
     }
 
+    /**
+     * Create a new phar file or open one
+     *
+     * @param $pathToFile
+     * @return $this
+     */
     public function phar($pathToFile)
     {
         $this->make($pathToFile, 'phar');
         return $this;
     }
 
+    /**
+     * Create a new rar archive or open an existing one
+     *
+     * @param $pathToFile
+     * @return $this
+     */
     public function rar($pathToFile)
     {
         $this->make($pathToFile, 'rar');
@@ -146,7 +164,6 @@ class Zipper
      */
     public function add($pathToAdd)
     {
-        //check if array or string
         if (is_array($pathToAdd)) {
             foreach ($pathToAdd as $dir) {
                 $this->add($dir);
@@ -231,15 +248,20 @@ class Zipper
     }
 
     /**
-     *
+     * Deletes the archive file
      */
     public function delete()
     {
-        @$this->zip->close();
+        @$this->repository->close();
         $this->file->delete($this->filePath);
         $this->filePath = "";
     }
 
+    /**
+     * Get the type of the Archive
+     *
+     * @return string
+     */
     public function getArchiveType()
     {
         return get_class($this->repository);
@@ -250,7 +272,28 @@ class Zipper
      */
     public function __destruct()
     {
-        @$this->zip->close();
+        @$this->repository->close();
+    }
+
+    /**
+     * Get the current internal folder pointer
+     *
+     * @return string
+     */
+    public function getCurrentFolderPath()
+    {
+        return $this->currentFolder;
+    }
+
+    /**
+     * Checks if a file is present in the archive
+     *
+     * @param $fileInArchive
+     * @return bool
+     */
+    public function contains($fileInArchive)
+    {
+        return $this->repository->fileExists($fileInArchive);
     }
 
     //---------------------PRIVATE FUNCTIONS-------------
@@ -310,36 +353,20 @@ class Zipper
     private function extractWithBlackList($path, $filesArray)
     {
 
-        for ($i = 0; $i < $this->zip->numFiles; $i++) {
-            //check if folder
-            $stats = $this->zip->statIndex($i);
-            if ($stats['size'] == 0 && $stats['crc'] == 0)
-                continue;
-
-            $fileName = $this->zip->getNameIndex($i);
+        $this->repository->each(function ($fileName) use ($path, $filesArray) {
             $oriName = $fileName;
 
             if (!empty($this->currentFolder) && !starts_with($fileName, $this->currentFolder))
-                continue;
-
-            if (!empty($this->currentFolder)) {
-                $fileName = str_replace($this->currentFolder . '/', '', $fileName);
-            }
+                return;
 
             if (starts_with($fileName, $filesArray)) {
-                //ignore the file
-                continue;
+                return;
             }
-            //if we are here extract it
-            //get right filename
-            if (!empty($this->currentFolder)) {
-                $tmpPath = str_replace($this->currentFolder . '/', '', $fileName);
-                $this->file->put($path . '/' . $tmpPath, $this->zip->getStream($oriName));
-            } else
-                if (!$this->zip->extractTo($path, $oriName))
-                    throw new Exception(sprintf('The file "%s" could not be extracted to "%s"',
-                        $oriName, $path));
-        }
+
+            $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
+            $this->file->put($path . '/' . $tmpPath, $this->repository->getFileStream($oriName));
+
+        });
     }
 
     /**
@@ -362,18 +389,13 @@ class Zipper
         });
     }
 
+    /**
+     * Gets the path to the internal folder
+     *
+     * @return string
+     */
     private function getInternalPath()
     {
         return empty($this->currentFolder) ? '' : $this->currentFolder . '/';
-    }
-
-    public function getCurrentFolderPath()
-    {
-        return $this->currentFolder;
-    }
-
-    public function contains($fileInArchive)
-    {
-        return $this->repository->fileExists($fileInArchive);
     }
 }
