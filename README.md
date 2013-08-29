@@ -22,17 +22,17 @@ You can then access Zipper with the `Zipper` alias.
 
 	$zipper = new \Chumper\Zipper\Zipper;
 
-    $zipper->make('test.zip')->add('composer.json','test');
-    $zipper-zip('test.zip')->add('composer.json','test');
+    $zipper->make('test.zip')->folder('test')->add('composer.json');
+    $zipper-zip('test.zip')->folder('test')->add('composer.json','test');
     
     $zipper->remove('composer.lock');
 
-    $zipper->add(
+    $zipper->folder('mySuperPackage')->add(
         array(
             'vendor',
             'composer.json'
         ),
-        'mySuperPackage');
+    );
 
     $zipper->getFileContent('mySuperPackage/composer.json');
 	
