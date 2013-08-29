@@ -4,7 +4,6 @@
 use Chumper\Zipper\Repositories\RepositoryInterface;
 use Exception;
 use Illuminate\Filesystem\Filesystem;
-use ZipArchive;
 
 /**
  * This Zipper class is a wrapper around the ZipArchive methods with some handy functions
@@ -12,7 +11,8 @@ use ZipArchive;
  * Class Zipper
  * @package Chumper\Zipper
  */
-class Zipper {
+class Zipper
+{
 
     /**
      * Constant for extracting
@@ -32,7 +32,7 @@ class Zipper {
     /**
      * @var integer The status of the Zip archive
      */
-    private  $status;
+    private $status;
 
     /**
      * @var Filesystem Handler to the file system
@@ -64,16 +64,22 @@ class Zipper {
      * opens a zip archive if the file exists
      *
      * @param $pathToFile string The file to open
-     * @param string $type The type of the archive, defaults to zip, possible are zip, phar, rar
+     * @param RepositoryInterface|string $type The type of the archive, defaults to zip, possible are zip, phar, rar
      *
      * @return $this Zipper instance
      */
     public function make($pathToFile, $type = 'zip')
     {
-        $name = 'Chumper\Zipper\Repositories\\'.ucwords($type).'Repository';
-        $this->repository = new $name;
-        $new = $this->createArchiveFile($pathToFile);
-        $this->openFile($pathToFile, $new);
+        $this->createArchiveFile($pathToFile);
+        $this->filePath = $pathToFile;
+
+        if (is_subclass_of($type, 'Chumper\Zipper\Repositories\RepositoryInterface'))
+            $this->repository = $type;
+        else {
+            $name = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
+            $this->repository = new $name($pathToFile);
+        }
+
         return $this;
     }
 
@@ -85,13 +91,13 @@ class Zipper {
 
     public function phar($pathToFile)
     {
-        $this->make($pathToFile,'phar');
+        $this->make($pathToFile, 'phar');
         return $this;
     }
 
     public function rar($pathToFile)
     {
-        $this->make($pathToFile,'rar');
+        $this->make($pathToFile, 'rar');
         return $this;
     }
 
@@ -107,11 +113,11 @@ class Zipper {
     public function extractTo($path, array $files = array(), $method = Zipper::BLACKLIST)
     {
         $path = realpath($path);
-        if(!$this->file->exists($path))
-            $this->file->makeDirectory($path,0755,true);
+        if (!$this->file->exists($path))
+            $this->file->makeDirectory($path, 0755, true);
 
-        if($method == Zipper::WHITELIST)
-            $this->extractWithWhiteList($path,$files);
+        if ($method == Zipper::WHITELIST)
+            $this->extractWithWhiteList($path, $files);
         else
             $this->extractWithBlackList($path, $files);
     }
@@ -119,17 +125,14 @@ class Zipper {
     /**
      * Gets the content of a single file if available
      *
-     * @param $filePath string The path of the file in the zip
-     * @param bool $useInternalFolder If it should prefix the name with the internal folder
+     * @param $filePath string The full path (including all folders) of the file in the zip
      * @throws \Exception
      * @return mixed returns the content or throws an exception
      */
-    public function getFileContent($filePath, $useInternalFolder = false)
+    public function getFileContent($filePath)
     {
-        if($useInternalFolder && !empty($this->currentFolder))
-            $filePath = $this->currentFolder.'/'.$filePath;
 
-        if($this->repository->fileExists($filePath) === false)
+        if ($this->repository->fileExists($filePath) === false)
             throw new Exception(sprintf('The file "%s" cannot be found', $filePath));
 
         return $this->repository->getFileContent($filePath);
@@ -143,20 +146,14 @@ class Zipper {
      */
     public function add($pathToAdd)
     {
-
         //check if array or string
-        if(is_array($pathToAdd))
-        {
-            foreach($pathToAdd as $dir)
-            {
+        if (is_array($pathToAdd)) {
+            foreach ($pathToAdd as $dir) {
                 $this->add($dir);
             }
-        }
-        else if($this->file->isFile($pathToAdd))
-        {
+        } else if ($this->file->isFile($pathToAdd)) {
             $this->addFile($pathToAdd);
-        }
-        else
+        } else
             $this->addDir($pathToAdd);
 
         return $this;
@@ -176,28 +173,18 @@ class Zipper {
      * Remove a file or array of files and folders from the zip archive
      *
      * @param $fileToRemove array|string The path/array to the files in the zip
-     * @param bool $useInternalFolder If it should prefix the name with the internal folder
      * @return $this Zipper instance
      */
-    public function remove($fileToRemove, $useInternalFolder = false)
+    public function remove($fileToRemove)
     {
-        if($useInternalFolder && !empty($this->currentFolder))
-            $fileToRemove = $this->currentFolder.'/'.$fileToRemove;
-
-        if(is_array($fileToRemove))
-        {
-            for($i=0; $i<$this->zip->numFiles; $i++)
-            {
-                $fileName = $this->zip->getNameIndex($i);
-                if(starts_with($fileName,$fileToRemove))
-                {
-                    //remove
-                    $this->zip->deleteIndex($fileName);
+        if (is_array($fileToRemove)) {
+            $this->repository->each(function ($file) use ($fileToRemove) {
+                if (starts_with($file, $fileToRemove)) {
+                    $this->repository->removeFile($file);
                 }
-            }
-        }
-        else
-            $this->zip->deleteName($fileToRemove);
+            });
+        } else
+            $this->repository->removeFile($fileToRemove);
 
         return $this;
     }
@@ -216,7 +203,7 @@ class Zipper {
      */
     public function close()
     {
-        @$this->zip->close();
+        @$this->repository->close();
         $this->filePath = "";
     }
 
@@ -246,10 +233,16 @@ class Zipper {
     /**
      *
      */
-    public function delete(){
+    public function delete()
+    {
         @$this->zip->close();
         $this->file->delete($this->filePath);
         $this->filePath = "";
+    }
+
+    public function getArchiveType()
+    {
+        return get_class($this->repository);
     }
 
     /**
@@ -267,15 +260,15 @@ class Zipper {
      * @return bool
      * @throws \Exception
      */
-    private function createArchiveFile($pathToZip){
+    private function createArchiveFile($pathToZip)
+    {
 
-        if(!$this->file->exists($pathToZip))
-        {
-            if(!$this->file->exists(dirname($pathToZip)))
-               $this->file->makeDirectory(dirname($pathToZip),0755,true);
+        if (!$this->file->exists($pathToZip)) {
+            if (!$this->file->exists(dirname($pathToZip)))
+                $this->file->makeDirectory(dirname($pathToZip), 0755, true);
 
-            if(!$this->file->isWritable(dirname($pathToZip)))
-                throw new Exception(sprintf('The path "%s" is not writeable',$pathToZip));
+            if (!$this->file->isWritable(dirname($pathToZip)))
+                throw new Exception(sprintf('The path "%s" is not writeable', $pathToZip));
 
             return true;
         }
@@ -283,47 +276,30 @@ class Zipper {
     }
 
     /**
-     * @param $pathToFile
-     * @param bool $create
-     */
-    private function openFile($pathToFile, $create = false)
-    {
-        if($create)
-            $this->status = $this->zip->open($pathToFile, ZipArchive::CREATE);
-        else
-            $this->status = $this->zip->open($pathToFile);
-
-        $this->filePath = $pathToFile;
-    }
-
-    /**
      * @param $pathToDir
-     * @param $rootDirInZip
      */
-    private function addDir($pathToDir, $rootDirInZip)
+    private function addDir($pathToDir)
     {
         //is a dir, so remotely go through it and call the add method
-        foreach($this->file->allFiles($pathToDir) as $file)
-        {
-            $this->addFile($pathToDir.'/'.$file->getRelativePathname(),$rootDirInZip);
+        foreach ($this->file->allFiles($pathToDir) as $file) {
+            $this->addFile($pathToDir . '/' . $file->getRelativePathname());
         }
     }
 
     /**
+     * Add the file to the zip
+     *
      * @param $pathToAdd
-     * @param $rootDirInZip
      */
-    private function addFile($pathToAdd, $rootDirInZip)
+    private function addFile($pathToAdd)
     {
-        empty($rootDirInZip) ? $path = false : $path = true;
-
         $info = pathinfo($pathToAdd);
-        $file_name = $info['filename'].'.'.$info['extension'];
 
-        if(!$path)
-            $this->zip->addFile($pathToAdd, $file_name);
-        else
-            $this->zip->addFile($pathToAdd,$rootDirInZip.'/'.$file_name);
+        $file_name = isset($info['extension']) ?
+            $info['filename'] . '.' . $info['extension'] :
+            $info['filename'];
+
+        $this->repository->addFile($pathToAdd, $this->getInternalPath() . $file_name);
     }
 
     /**
@@ -334,38 +310,33 @@ class Zipper {
     private function extractWithBlackList($path, $filesArray)
     {
 
-        for($i=0; $i<$this->zip->numFiles; $i++)
-        {
+        for ($i = 0; $i < $this->zip->numFiles; $i++) {
             //check if folder
             $stats = $this->zip->statIndex($i);
-            if($stats['size'] == 0 && $stats['crc'] == 0)
+            if ($stats['size'] == 0 && $stats['crc'] == 0)
                 continue;
 
             $fileName = $this->zip->getNameIndex($i);
             $oriName = $fileName;
 
-            if(!empty($this->currentFolder) && !starts_with($fileName,$this->currentFolder))
+            if (!empty($this->currentFolder) && !starts_with($fileName, $this->currentFolder))
                 continue;
 
-            if(!empty($this->currentFolder))
-            {
-                $fileName = str_replace($this->currentFolder.'/','',$fileName);
+            if (!empty($this->currentFolder)) {
+                $fileName = str_replace($this->currentFolder . '/', '', $fileName);
             }
 
-            if(starts_with($fileName,$filesArray))
-            {
+            if (starts_with($fileName, $filesArray)) {
                 //ignore the file
                 continue;
             }
             //if we are here extract it
             //get right filename
-            if(!empty($this->currentFolder))
-            {
-                $tmpPath = str_replace($this->currentFolder.'/', '', $fileName);
-                $this->file->put($path.'/'.$tmpPath,$this->zip->getStream($oriName));
-            }
-            else
-                if(!$this->zip->extractTo($path,$oriName))
+            if (!empty($this->currentFolder)) {
+                $tmpPath = str_replace($this->currentFolder . '/', '', $fileName);
+                $this->file->put($path . '/' . $tmpPath, $this->zip->getStream($oriName));
+            } else
+                if (!$this->zip->extractTo($path, $oriName))
                     throw new Exception(sprintf('The file "%s" could not be extracted to "%s"',
                         $oriName, $path));
         }
@@ -378,37 +349,31 @@ class Zipper {
      */
     private function extractWithWhiteList($path, $filesArray)
     {
-        for($i=0; $i<$this->zip->numFiles; $i++)
-        {
-            //check if folder
-            $stats = $this->zip->statIndex($i);
-            if($stats['size'] == 0 && $stats['crc'] == 0)
-                continue;
-
-            $fileName = $this->zip->getNameIndex($i);
+        $this->repository->each(function ($fileName) use ($path, $filesArray) {
             $oriName = $fileName;
 
-            if(!empty($this->currentFolder) && !starts_with($fileName,$this->currentFolder))
-                continue;
+            if (!empty($this->currentFolder) && !starts_with($fileName, $this->currentFolder))
+                return;
 
-            if(!empty($this->currentFolder))
-            {
-                $fileName = str_replace($this->currentFolder.'/','',$fileName);
+            if (starts_with($this->getInternalPath() . $fileName, $filesArray)) {
+                $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
+                $this->file->put($path . '/' . $tmpPath, $this->repository->getFileStream($oriName));
             }
+        });
+    }
 
-            if(starts_with($fileName,$filesArray))
-            {
-                //get right filename
-                if(!empty($this->currentFolder))
-                {
-                    $tmpPath = str_replace($this->currentFolder.'/', '', $fileName);
-                    $this->file->put($path.'/'.$tmpPath,$this->zip->getStream($oriName));
-                }
-                else
-                    if(!$this->zip->extractTo($path,$oriName))
-                        throw new Exception(sprintf('The file "%s" could not be extracted to "%s"',
-                            $oriName, $path));
-            }
-        }
+    private function getInternalPath()
+    {
+        return empty($this->currentFolder) ? '' : $this->currentFolder . '/';
+    }
+
+    public function getCurrentFolderPath()
+    {
+        return $this->currentFolder;
+    }
+
+    public function contains($fileInArchive)
+    {
+        return $this->repository->fileExists($fileInArchive);
     }
 }

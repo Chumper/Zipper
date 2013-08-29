@@ -105,4 +105,12 @@ class ZipRepository implements RepositoryInterface
         return $this->archive->getStatusString();
     }
 
+    /**
+     * Closes the archive and saves it
+     * @return void
+     */
+    public function close()
+    {
+        // TODO: Implement close() method.
+    }
 }
