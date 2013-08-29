@@ -75,9 +75,9 @@ You can specify an array or string of files that will be white listed or black l
 get the content of a file in the zip. This will return the content or false.
 
 
-**add($pathToAdd, $rootDirInZip = '')**
+**add($pathToAdd)**
 
-add a string or an array of files to the zip under the root dir specified in the second parameter
+add a string or an array of files to the zip
 You can name files or folder, all files in the folder then will be added.
 
 
