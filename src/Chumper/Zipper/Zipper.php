@@ -1,6 +1,7 @@
 <?php namespace Chumper\Zipper;
 
 
+use Chumper\Zipper\Repositories\RepositoryInterface;
 use Exception;
 use Illuminate\Filesystem\Filesystem;
 use ZipArchive;
@@ -39,7 +40,7 @@ class Zipper {
     private $file;
 
     /**
-     * @var Repository Handler to the archive
+     * @var RepositoryInterface Handler to the archive
      */
     private $repository;
 
@@ -63,13 +64,34 @@ class Zipper {
      * opens a zip archive if the file exists
      *
      * @param $pathToFile string The file to open
+     * @param string $type The type of the archive, defaults to zip, possible are zip, phar, rar
+     *
      * @return $this Zipper instance
      */
-    public function make($pathToFile)
+    public function make($pathToFile, $type = 'zip')
     {
-        $this->repository = new ZipArchive;
-        $new = $this->createZipFile($pathToFile);
+        $name = 'Chumper\Zipper\Repositories\\'.ucwords($type).'Repository';
+        $this->repository = new $name;
+        $new = $this->createArchiveFile($pathToFile);
         $this->openFile($pathToFile, $new);
+        return $this;
+    }
+
+    public function zip($pathToFile)
+    {
+        $this->make($pathToFile);
+        return $this;
+    }
+
+    public function phar($pathToFile)
+    {
+        $this->make($pathToFile,'phar');
+        return $this;
+    }
+
+    public function rar($pathToFile)
+    {
+        $this->make($pathToFile,'rar');
         return $this;
     }
 
@@ -107,37 +129,35 @@ class Zipper {
         if($useInternalFolder && !empty($this->currentFolder))
             $filePath = $this->currentFolder.'/'.$filePath;
 
-        if($this->zip->locateName($filePath) === false)
+        if($this->repository->fileExists($filePath) === false)
             throw new Exception(sprintf('The file "%s" cannot be found', $filePath));
 
-        return $this->zip->getFromName($filePath);
+        return $this->repository->getFileContent($filePath);
     }
 
     /**
      * Add one or multiple files to the zip.
      *
      * @param $pathToAdd array|string An array or string of files and folders to add
-     * @param string $rootDirInZip The root directory in the zip. All folders will be appenderd
      * @return $this Zipper instance
      */
-    public function add($pathToAdd, $rootDirInZip = NULL)
+    public function add($pathToAdd)
     {
-        if(is_null($rootDirInZip))$rootDirInZip = $this->currentFolder;
 
         //check if array or string
         if(is_array($pathToAdd))
         {
             foreach($pathToAdd as $dir)
             {
-                $this->add($dir, $rootDirInZip);
+                $this->add($dir);
             }
         }
         else if($this->file->isFile($pathToAdd))
         {
-            $this->addFile($pathToAdd,$rootDirInZip);
+            $this->addFile($pathToAdd);
         }
         else
-            $this->addDir($pathToAdd,$rootDirInZip);
+            $this->addDir($pathToAdd);
 
         return $this;
     }
@@ -149,7 +169,7 @@ class Zipper {
      */
     public function getStatus()
     {
-        return $this->zip->getStatusString();
+        return $this->repository->getStatus();
     }
 
     /**
