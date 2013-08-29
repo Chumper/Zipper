@@ -23,6 +23,8 @@ You can then access Zipper with the `Zipper` alias.
 	$zipper = new \Chumper\Zipper\Zipper;
 
     $zipper->make('test.zip')->add('composer.json','test');
+    $zipper-zip('test.zip')->add('composer.json','test');
+    
     $zipper->remove('composer.lock');
 
     $zipper->add(
@@ -93,6 +95,21 @@ removes a single file or an array of files from the zip.
 
 closes the zip and writes all changes
 
+**folder($folder)**
+
+Sets the internal pointer to this folder
+
+**home()**
+
+Resets the folder pointer
+
+**zip($fileName)**
+
+USes the ZipRepository for file handling
+
 ##Development
+
+May it is a goot idea to add other compress functions like rar, phar or bzip2 etc...
+Everything is setup for that, if you want just fork and develop further.
 
 If you need other functions or got errors, please leave an issue on github.
