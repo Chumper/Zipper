@@ -18,8 +18,10 @@ interface RepositoryInterface
      * Construct with a given path
      *
      * @param $filePath
+     * @param bool $new
+     * @param $archiveImplementation
      */
-    function __construct($filePath);
+    function __construct($filePath, $new = false, $archiveImplementation = null);
 
     /**
      * Add a file to the opened Archive

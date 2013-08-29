@@ -11,17 +11,23 @@ class ZipRepository implements RepositoryInterface
      * Construct with a given path
      *
      * @param $filePath
-     * @param null $archive
+     * @param bool $create
+     * @param $archive
      * @throws \Exception
-     * @return \Chumper\Zipper\Repositories\ZipRepository
+     * @return ZipRepository
      */
-    function __construct($filePath, $archive = null)
+    function __construct($filePath, $create = false, $archive = null)
     {
         //Check if ZipArchive is available
         if (!class_exists('ZipArchive'))
             throw new Exception('Error: Your PHP version is not compiled with zip support');
 
         $this->archive = $archive ? $archive : new ZipArchive;
+
+        if ($create)
+            $this->archive->open($filePath, ZipArchive::CREATE);
+        else
+            $this->archive->open($filePath);
     }
 
     /**
@@ -118,6 +124,6 @@ class ZipRepository implements RepositoryInterface
      */
     public function close()
     {
-        $this->archive->close();
+        @$this->archive->close();
     }
 }

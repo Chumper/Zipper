@@ -25,7 +25,13 @@ class ZipRepositoryTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->mock = Mockery::mock(new ZipArchive);
-        $this->zip = new ZipRepository('foo', $this->mock);
+        $this->zip = new ZipRepository('foo', true, $this->mock);
+    }
+
+    public function testMake()
+    {
+        $zip = new ZipRepository('foo.zip', true);
+        $this->assertFalse($zip->fileExists('foo'));
     }
 
     public function testAddFile()

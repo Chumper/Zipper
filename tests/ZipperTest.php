@@ -24,7 +24,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $this->archive = new \Chumper\Zipper\Zipper(
             $this->file = Mockery::mock(new Filesystem)
         );
-        $this->archive->make('foo', new ArrayArchive('foo'));
+        $this->archive->make('foo', new ArrayArchive('foo', true));
     }
 
     public function testMake()

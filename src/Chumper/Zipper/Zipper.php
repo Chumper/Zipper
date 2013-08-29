@@ -25,14 +25,9 @@ class Zipper
     const BLACKLIST = 2;
 
     /**
-     * @var string Represents the current location in the zip
+     * @var string Represents the current location in the archive
      */
     private $currentFolder = '';
-
-    /**
-     * @var integer The status of the Zip archive
-     */
-    private $status;
 
     /**
      * @var Filesystem Handler to the file system
@@ -64,20 +59,20 @@ class Zipper
      * opens a zip archive if the file exists
      *
      * @param $pathToFile string The file to open
-     * @param RepositoryInterface|string $type The type of the archive, defaults to zip, possible are zip, phar, rar
+     * @param RepositoryInterface|string $type The type of the archive, defaults to zip, possible are zip, phar
      *
      * @return $this Zipper instance
      */
     public function make($pathToFile, $type = 'zip')
     {
-        $this->createArchiveFile($pathToFile);
+        $new = $this->createArchiveFile($pathToFile);
         $this->filePath = $pathToFile;
 
         if (is_subclass_of($type, 'Chumper\Zipper\Repositories\RepositoryInterface'))
             $this->repository = $type;
         else {
             $name = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
-            $this->repository = new $name($pathToFile);
+            $this->repository = new $name($pathToFile, $new);
         }
 
         return $this;
@@ -104,18 +99,6 @@ class Zipper
     public function phar($pathToFile)
     {
         $this->make($pathToFile, 'phar');
-        return $this;
-    }
-
-    /**
-     * Create a new rar archive or open an existing one
-     *
-     * @param $pathToFile
-     * @return $this
-     */
-    public function rar($pathToFile)
-    {
-        $this->make($pathToFile, 'rar');
         return $this;
     }
 
@@ -300,8 +283,8 @@ class Zipper
 
     /**
      * @param $pathToZip
-     * @return bool
      * @throws \Exception
+     * @return bool
      */
     private function createArchiveFile($pathToZip)
     {
