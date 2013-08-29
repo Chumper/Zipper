@@ -104,4 +104,5 @@ class ZipRepository implements RepositoryInterface
     {
         return $this->archive->getStatusString();
     }
+
 }
