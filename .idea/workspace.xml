@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f4d6763b-3176-4dbb-beeb-4db350291497" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Chumper/Zipper/Zipper.php" afterPath="$PROJECT_DIR$/src/Chumper/Zipper/Zipper.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="zipper.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/Dummy.txt" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1380140748981" ignored="false" />
-    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1377711424920" ignored="false" />
-    <file path="/dummy.txt" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1380140811846" ignored="false" />
+    <file path="/dummy.txt" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1380141566418" ignored="false" />
     <file path="/RepositoryInterface.php" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1377806928978" ignored="false" />
     <file path="/Zipper.php" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1380141459378" ignored="false" />
     <file path="/ZipRepositoryTest.php" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1377807284678" ignored="false" />
@@ -35,6 +35,7 @@
     <file path="$PROJECT_DIR$/../../../../partners.iyt/app/routes.php" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1377881017581" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../partners.iyt/app/filters.php" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1377880398794" ignored="false" />
     <file path="/routes.php" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1377880911019" ignored="false" />
+    <file path="/.gitignore" changelist="f4d6763b-3176-4dbb-beeb-4db350291497" time="1380141581222" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,10 +84,19 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Zipper.php" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="Zipper.php" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/Chumper/Zipper/Zipper.php">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="206" column="12" selection-start="5341" selection-end="5341" vertical-scroll-proportion="0.85918367">
+                <state line="205" column="39" selection-start="5328" selection-end="5328" vertical-scroll-proportion="-7.8039217">
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/.gitignore">
+              <provider selected="true" editor-type-id="text-editor">
+                <state line="4" column="6" selection-start="52" selection-end="52" vertical-scroll-proportion="0.16546762">
                   <folding />
                 </state>
               </provider>
@@ -117,7 +127,7 @@
           <file leaf-file-name="ZipRepository.php" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/Chumper/Zipper/Repositories/ZipRepository.php">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="35" column="25" selection-start="890" selection-end="890" vertical-scroll-proportion="0.51492536">
+                <state line="35" column="25" selection-start="890" selection-end="890" vertical-scroll-proportion="0.51301116">
                   <folding />
                 </state>
               </provider>
@@ -153,6 +163,11 @@
       <command text="git pull" />
       <command text="git pull master" />
       <command text="git pull remote master" />
+      <command text="cd workbench" />
+      <command text="cd .." />
+      <command text="cd zipper/" />
+      <command text="git add -A" />
+      <command text="git commit -m &quot;fixed #4&quot;" />
     </commandsHistory>
   </component>
   <component name="Git.Settings">
@@ -182,6 +197,7 @@
         <option value="$PROJECT_DIR$/composer.json" />
         <option value="$PROJECT_DIR$/tests/ZipperTest.php" />
         <option value="$PROJECT_DIR$/src/Chumper/Zipper/Zipper.php" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -565,12 +581,12 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18890075" sideWeight="0.66926503" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18890075" sideWeight="0.6714922" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33073497" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33073497" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Command Line Tools Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3288889" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33073497" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Command Line Tools Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32850778" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32962137" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -650,13 +666,6 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tests/ArrayArchive.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="23" selection-start="209" selection-end="209" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tests/Repositories/ZipRepositoryTest.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="32" column="50" selection-start="639" selection-end="639" vertical-scroll-proportion="0.0">
@@ -735,7 +744,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Chumper/Zipper/Repositories/ZipRepository.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="25" selection-start="890" selection-end="890" vertical-scroll-proportion="0.51492536">
+        <state line="35" column="25" selection-start="890" selection-end="890" vertical-scroll-proportion="0.51301116">
           <folding />
         </state>
       </provider>
@@ -749,7 +758,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Chumper/Zipper/Zipper.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="206" column="12" selection-start="5341" selection-end="5341" vertical-scroll-proportion="0.85918367">
+        <state line="205" column="39" selection-start="5328" selection-end="5328" vertical-scroll-proportion="-7.8039217">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="6" selection-start="52" selection-end="52" vertical-scroll-proportion="0.16546762">
           <folding />
         </state>
       </provider>
