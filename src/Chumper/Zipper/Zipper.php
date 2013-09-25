@@ -203,7 +203,8 @@ class Zipper
      */
     public function close()
     {
-        @$this->repository->close();
+        if(!is_null($this->repository))
+            $this->repository->close();
         $this->filePath = "";
     }
 
@@ -235,7 +236,9 @@ class Zipper
      */
     public function delete()
     {
-        @$this->repository->close();
+        if(!is_null($this->repository))
+            $this->repository->close();
+
         $this->file->delete($this->filePath);
         $this->filePath = "";
     }
@@ -255,7 +258,8 @@ class Zipper
      */
     public function __destruct()
     {
-        @$this->repository->close();
+        if(!is_null($this->repository))
+            $this->repository->close();
     }
 
     /**
