@@ -178,9 +178,10 @@ class Zipper
     public function remove($fileToRemove)
     {
         if (is_array($fileToRemove)) {
-            $this->repository->each(function ($file) use ($fileToRemove) {
+            $self = $this;
+            $this->repository->each(function ($file) use ($fileToRemove, $self) {
                 if (starts_with($file, $fileToRemove)) {
-                    $this->repository->removeFile($file);
+                    $self->repository->removeFile($file);
                 }
             });
         } else
@@ -339,19 +340,19 @@ class Zipper
      */
     private function extractWithBlackList($path, $filesArray)
     {
-
-        $this->repository->each(function ($fileName) use ($path, $filesArray) {
+        $self = $this;
+        $this->repository->each(function ($fileName) use ($path, $filesArray, $self) {
             $oriName = $fileName;
 
-            if (!empty($this->currentFolder) && !starts_with($fileName, $this->currentFolder))
+            if (!empty($self->currentFolder) && !starts_with($fileName, $self->currentFolder))
                 return;
 
             if (starts_with($fileName, $filesArray)) {
                 return;
             }
 
-            $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
-            $this->file->put($path . '/' . $tmpPath, $this->repository->getFileStream($oriName));
+            $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
+            $self->file->put($path . '/' . $tmpPath, $self->repository->getFileStream($oriName));
 
         });
     }
@@ -363,15 +364,16 @@ class Zipper
      */
     private function extractWithWhiteList($path, $filesArray)
     {
-        $this->repository->each(function ($fileName) use ($path, $filesArray) {
+        $self = $this;
+        $this->repository->each(function ($fileName) use ($path, $filesArray, $self) {
             $oriName = $fileName;
 
-            if (!empty($this->currentFolder) && !starts_with($fileName, $this->currentFolder))
+            if (!empty($self->currentFolder) && !starts_with($fileName, $self->currentFolder))
                 return;
 
-            if (starts_with($this->getInternalPath() . $fileName, $filesArray)) {
-                $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
-                $this->file->put($path . '/' . $tmpPath, $this->repository->getFileStream($oriName));
+            if (starts_with($self->getInternalPath() . $fileName, $filesArray)) {
+                $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
+                $self->file->put($path . '/' . $tmpPath, $self->repository->getFileStream($oriName));
             }
         });
     }
