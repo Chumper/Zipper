@@ -300,6 +300,16 @@ class Zipper
         return $this->file;
     }
 
+    /**
+     * Gets the path to the internal folder
+     *
+     * @return string
+     */
+    public function getInternalPath()
+    {
+        return empty($this->currentFolder) ? '' : $this->currentFolder . '/';
+    }
+
     //---------------------PRIVATE FUNCTIONS-------------
 
     /**
@@ -395,15 +405,4 @@ class Zipper
             }
         });
     }
-
-    /**
-     * Gets the path to the internal folder
-     *
-     * @return string
-     */
-    private function getInternalPath()
-    {
-        return empty($this->currentFolder) ? '' : $this->currentFolder . '/';
-    }
-
 }
