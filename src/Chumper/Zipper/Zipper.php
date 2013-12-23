@@ -284,6 +284,22 @@ class Zipper
         return $this->repository->fileExists($fileInArchive);
     }
 
+    /**
+     * @return RepositoryInterface
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @return Filesystem
+     */
+    public function getFileHandler()
+    {
+        return $this->file;
+    }
+
     //---------------------PRIVATE FUNCTIONS-------------
 
     /**
@@ -390,19 +406,4 @@ class Zipper
         return empty($this->currentFolder) ? '' : $this->currentFolder . '/';
     }
 
-    /**
-     * @return RepositoryInterface
-     */
-    private function getRepository()
-    {
-        return $this->repository;
-    }
-
-    /**
-     * @return Filesystem
-     */
-    private function getFileHandler()
-    {
-        return $this->file;
-    }
 }
