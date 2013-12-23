@@ -379,7 +379,7 @@ class Zipper
             }
 
             $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-            $self->getFileHandler()->put($path . '/' . $tmpPath, $self->repository->getFileStream($oriName));
+            $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
 
         });
     }
