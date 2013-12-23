@@ -181,7 +181,7 @@ class Zipper
             $self = $this;
             $this->repository->each(function ($file) use ($fileToRemove, $self) {
                 if (starts_with($file, $fileToRemove)) {
-                    $self->repository->removeFile($file);
+                    $self->getRepository()->removeFile($file);
                 }
             });
         } else
@@ -344,7 +344,8 @@ class Zipper
         $this->repository->each(function ($fileName) use ($path, $filesArray, $self) {
             $oriName = $fileName;
 
-            if (!empty($self->currentFolder) && !starts_with($fileName, $self->currentFolder))
+            $currentPath = $self->getCurrentFolderPath();
+            if (!empty($currentPath) && !starts_with($fileName, $currentPath))
                 return;
 
             if (starts_with($fileName, $filesArray)) {
@@ -352,7 +353,7 @@ class Zipper
             }
 
             $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-            $self->file->put($path . '/' . $tmpPath, $self->repository->getFileStream($oriName));
+            $self->getFileHandler()->put($path . '/' . $tmpPath, $self->repository->getFileStream($oriName));
 
         });
     }
@@ -368,12 +369,13 @@ class Zipper
         $this->repository->each(function ($fileName) use ($path, $filesArray, $self) {
             $oriName = $fileName;
 
-            if (!empty($self->currentFolder) && !starts_with($fileName, $self->currentFolder))
+            $currentPath = $self->getCurrentFolderPath();
+            if (!empty($currentPath) && !starts_with($fileName, $currentPath))
                 return;
 
             if (starts_with($self->getInternalPath() . $fileName, $filesArray)) {
                 $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-                $self->file->put($path . '/' . $tmpPath, $self->repository->getFileStream($oriName));
+                $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
             }
         });
     }
@@ -386,5 +388,21 @@ class Zipper
     private function getInternalPath()
     {
         return empty($this->currentFolder) ? '' : $this->currentFolder . '/';
+    }
+
+    /**
+     * @return RepositoryInterface
+     */
+    private function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @return Filesystem
+     */
+    private function getFileHandler()
+    {
+        return $this->file;
     }
 }
