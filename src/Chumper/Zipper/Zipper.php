@@ -324,7 +324,7 @@ class Zipper
             if (!$this->file->exists(dirname($pathToZip)))
                 $this->file->makeDirectory(dirname($pathToZip), 0755, true);
 
-            if (!$this->file->isWritable(dirname($pathToZip)))
+            if (!is_writable((dirname($pathToZip)))
                 throw new Exception(sprintf('The path "%s" is not writeable', $pathToZip));
 
             return true;
