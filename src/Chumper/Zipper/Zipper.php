@@ -68,12 +68,11 @@ class Zipper
         $new = $this->createArchiveFile($pathToFile);
         $this->filePath = $pathToFile;
 
-        if (is_subclass_of($type, 'Chumper\Zipper\Repositories\RepositoryInterface'))
+        $name = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
+        if (is_subclass_of($name, 'Chumper\Zipper\Repositories\RepositoryInterface'))
             $this->repository = $type;
-        else {
-            $name = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
+        else
             $this->repository = new $name($pathToFile, $new);
-        }
 
         return $this;
     }
