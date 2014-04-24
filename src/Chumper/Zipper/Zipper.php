@@ -378,6 +378,13 @@ class Zipper
             }
 
             $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
+            
+            // We need to create the directory first in case it doesn't exist
+			$full_path = $path . '/' . $tmpPath;
+			$dir = substr($full_path, 0, strrpos($full_path, '/'));
+			if(!is_dir($dir))
+				$self->getFileHandler()->makeDirectory($dir, 0777, true, true);
+            
             $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
 
         });
@@ -400,6 +407,13 @@ class Zipper
 
             if (starts_with($self->getInternalPath() . $fileName, $filesArray)) {
                 $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
+                
+                // We need to create the directory first in case it doesn't exist
+				$full_path = $path . '/' . $tmpPath;
+				$dir = substr($full_path, 0, strrpos($full_path, '/'));
+				if(!is_dir($dir))
+					$self->getFileHandler()->makeDirectory($dir, 0777, true, true);
+					
                 $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
             }
         });
