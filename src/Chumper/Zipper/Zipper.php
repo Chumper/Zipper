@@ -70,9 +70,10 @@ class Zipper
 
         $name = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
         if (is_subclass_of($name, 'Chumper\Zipper\Repositories\RepositoryInterface'))
-            $this->repository = $type;
-        else
             $this->repository = new $name($pathToFile, $new);
+        else
+	        //TODO $type should be a class name and not a string
+            $this->repository = $type;
 
         return $this;
     }
