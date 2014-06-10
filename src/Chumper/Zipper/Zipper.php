@@ -337,9 +337,17 @@ class Zipper
      */
     private function addDir($pathToDir)
     {
-        //is a dir, so remotely go through it and call the add method
-        foreach ($this->file->allFiles($pathToDir) as $file) {
-            $this->addFile($pathToDir . '/' . $file->getRelativePathname());
+        // First go over the files in this directory and add them to the repository.
+        foreach ($this->file->files($pathToDir) as $file) {
+            $this->addFile($pathToDir . '/' . basename($file));
+        }
+
+        // Now let's visit the subdirectories and add them, too.
+        foreach ($this->file->directories($pathToDir) as $dir) {
+            $old_folder = $this->currentFolder;
+            $this->currentFolder = $this->currentFolder . '/' . basename($dir);
+            $this->addDir($pathToDir . '/' . basename($dir));
+            $this->currentFolder = $old_folder;
         }
     }
 
