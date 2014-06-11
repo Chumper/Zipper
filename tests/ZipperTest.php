@@ -46,17 +46,18 @@ class ZipperTest extends PHPUnit_Framework_TestCase
             ->times(3)->andReturn(true);
 
         /**Array**/
-        $file1 = Mockery::mock('File');
-        $file1->shouldReceive('getRelativePathname')
-            ->andReturn('foo.bar');
-        $file2 = Mockery::mock('File');
-        $file2->shouldReceive('getRelativePathname')
-            ->andReturn('foo');
-
-        $this->file->shouldReceive('isFile')->with('fooDir')
+        $this->file->shouldReceive('isFile')->with('/path/to/fooDir')
             ->once()->andReturn(false);
-        $this->file->shouldReceive('allFiles')->with('fooDir')
-            ->once()->andReturn(array($file1, $file2));
+
+        $this->file->shouldReceive('files')->with('/path/to/fooDir')
+            ->once()->andReturn(array('foo.bar', 'bar.foo'));
+        $this->file->shouldReceive('directories')->with('/path/to/fooDir')
+            ->once()->andReturn(array('fooSubdir'));
+
+        $this->file->shouldReceive('files')->with('/path/to/fooDir/fooSubdir')
+            ->once()->andReturn(array('foo.bar'));
+        $this->file->shouldReceive('directories')->with('/path/to/fooDir/fooSubdir')
+            ->once()->andReturn(array());
 
         //test1
         $this->archive->add('foo.bar');
@@ -73,11 +74,15 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $this->archive->getFileContent('foo'));
         $this->assertEquals('foo.bar', $this->archive->getFileContent('foo.bar'));
 
-        //test3
-        $this->archive->add('fooDir');
-
-        $this->assertEquals('foo', $this->archive->getFileContent('foo'));
-        $this->assertEquals('foo.bar', $this->archive->getFileContent('foo.bar'));
+        /**
+         * test3:
+         * Add the local folder /path/to/fooDir as folder fooDir to the repository
+         * and make sure the folder structure within the repository is there.
+         */
+        $this->archive->folder('fooDir')->add('/path/to/fooDir');
+        $this->assertEquals('fooDir/foo.bar', $this->archive->getFileContent('fooDir/foo.bar'));
+        $this->assertEquals('fooDir/bar.foo', $this->archive->getFileContent('fooDir/bar.foo'));
+        $this->assertEquals('fooDir/fooSubdir/foo.bar', $this->archive->getFileContent('fooDir/fooSubdir/foo.bar'));
 
     }
 
