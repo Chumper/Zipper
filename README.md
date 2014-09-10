@@ -23,7 +23,7 @@ You can then access Zipper with the `Zipper` alias.
 	$zipper = new \Chumper\Zipper\Zipper;
 
     $zipper->make('test.zip')->folder('test')->add('composer.json');
-    $zipper-zip('test.zip')->folder('test')->add('composer.json','test');
+    $zipper->zip('test.zip')->folder('test')->add('composer.json','test');
     
     $zipper->remove('composer.lock');
 
