@@ -200,4 +200,39 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('test/bing', $this->archive->getFileContent('test/bing'));
 
     }
+
+    public function testListFiles()
+    {
+        // testing empty file
+        $this->file->shouldReceive('isFile')->with('foo.file')->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('bar.file')->andReturn(true);
+
+        $this->assertEquals(array(), $this->archive->listFiles());
+
+        // testing not empty file
+        $this->archive->add('foo.file');
+        $this->archive->add('bar.file');
+
+        $this->assertEquals(array('foo.file', 'bar.file'), $this->archive->listFiles());
+
+        // testing with a empty sub dir
+        $this->file->shouldReceive('isFile')->with('/path/to/subDirEmpty')->andReturn(false);
+
+        $this->file->shouldReceive('files')->with('/path/to/subDirEmpty')->andReturn(array());
+        $this->file->shouldReceive('directories')->with('/path/to/subDirEmpty')->andReturn(array());
+        $this->archive->folder('subDirEmpty')->add('/path/to/subDirEmpty');
+
+        $this->assertEquals(array('foo.file', 'bar.file'), $this->archive->listFiles());
+
+        // testing with a not empty sub dir
+        $this->file->shouldReceive('isFile')->with('/path/to/subDir')->andReturn(false);
+        $this->file->shouldReceive('isFile')->with('sub.file')->andReturn(true);
+
+        $this->file->shouldReceive('files')->with('/path/to/subDir')->andReturn(array('sub.file'));
+        $this->file->shouldReceive('directories')->with('/path/to/subDir')->andReturn(array());
+
+        $this->archive->folder('subDir')->add('/path/to/subDir');
+
+        $this->assertEquals(array('foo.file', 'bar.file', 'subDir/sub.file'), $this->archive->listFiles());
+    }
 }

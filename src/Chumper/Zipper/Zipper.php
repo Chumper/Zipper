@@ -427,4 +427,21 @@ class Zipper
             }
         });
     }
+
+    /**
+     * List files that are within the archive
+     *
+     * @return array
+     */
+    public function listFiles()
+    {
+        $filesList = array();
+        $this->repository->each(
+            function ($file) use (&$filesList) {
+                $filesList[] = $file;
+            }
+        );
+
+        return $filesList;
+    }
 }
