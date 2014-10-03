@@ -4,7 +4,7 @@ use Chumper\Zipper\Repositories\RepositoryInterface;
 
 class ArrayArchive implements RepositoryInterface
 {
-    private $entries;
+    private $entries = array();
 
     /**
      * Construct with a given path
