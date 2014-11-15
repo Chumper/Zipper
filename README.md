@@ -80,6 +80,10 @@ get the content of a file in the zip. This will return the content or false.
 add a string or an array of files to the zip
 You can name files or folder, all files in the folder then will be added.
 
+**addString($filename, $content)**
+
+add a file to the zip by specifying a name and content as strings
+
 
 **getStatus()**
 

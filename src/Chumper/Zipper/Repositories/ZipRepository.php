@@ -41,6 +41,18 @@ class ZipRepository implements RepositoryInterface
     {
         $this->archive->addFile($pathToFile, $pathInArchive);
     }
+	
+	/**
+     * Add a file to the opened Archive using its contents 
+     *
+     * @param $name
+     * @param $content
+     * @return void
+     */
+    public function addFromString($name, $content)
+    {
+        $this->archive->addFromString($name, $content);
+    }
 
     /**
      * Remove a file permanently from the Archive
