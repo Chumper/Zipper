@@ -158,6 +158,21 @@ class Zipper
 
         return $this;
     }
+	
+    /**
+     * Add a file to the zip using its contents
+     *
+     * @param $filename string The name of the file to create
+	 * @param $content string The file contents
+     * @return $this Zipper instance
+     */
+    public function addString($filename, $content)
+    {
+        $this->addFromString($filename, $content);
+
+        return $this;
+    }
+	
 
     /**
      * Gets the status of the zip.
@@ -366,6 +381,18 @@ class Zipper
 
         $this->repository->addFile($pathToAdd, $this->getInternalPath() . $file_name);
     }
+	
+    /**
+     * Add the file to the zip from content
+     *
+     * @param $filename
+	 * @param $content
+     */
+    private function addFromString($filename, $content)
+    {
+        $this->repository->addFromString($this->getInternalPath() . $filename, $content);
+    }
+	
 
     /**
      * @param $path
