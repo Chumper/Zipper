@@ -8,7 +8,7 @@ This is a simple Wrapper around the ZipArchive methods with some handy functions
 
 To install this package just require it in your `composer.json` with
 
-	"Chumper/Zipper": "dev-master"
+	"Chumper/Zipper": "0.5.0"
 
 This package also includes Laravel 4 support, to activate it add
 
