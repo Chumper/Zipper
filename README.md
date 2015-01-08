@@ -60,7 +60,7 @@ So you can for example implement an update method which will just override the c
 
 **make($pathToFile)**
 
-create or open a zip archive; if the file does not exists it will create a new one.
+`Create` or `Open` a zip archive; if the file does not exists it will create a new one.
 It will return the Zipper instance so you can chain easily.
 
 
@@ -81,7 +81,10 @@ removes a single file or an array of files from the zip.
 
 **folder($folder)**
 
-Specify a folder to 'add to' or 'remove from' the zip, check `extractTo` below for more info.
+Specify a folder to 'add files to' or 'remove files from' from the zip, example
+
+	Zipper::make('test.zip')->folder('test')->add('composer.json');
+	Zipper::make('test.zip')->folder('test')->remove('composer.json');
 
 
 **home()**
