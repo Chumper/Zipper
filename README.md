@@ -29,23 +29,25 @@ Zipper::make('public/test.zip')->add($files);
 ```
 - by default the package will create the `test.zip` in the project route folder but in the example above we changed it to `project_route/public/`.
 
-###with more options
+####Another example
 ```php
-Zipper::make('test.zip')->folder('test')->add('composer.json');
-Zipper::zip('test.zip')->folder('test')->add('composer.json','test');
+$zipper = new \Chumper\Zipper\Zipper;
 
-Zipper::remove('composer.lock');
+$zipper->make('test.zip')->folder('test')->add('composer.json');
+$zipper->zip('test.zip')->folder('test')->add('composer.json','test');
 
-Zipper::folder('mySuperPackage')->add(
+$zipper->remove('composer.lock');
+
+$zipper->folder('mySuperPackage')->add(
     array(
         'vendor',
         'composer.json'
     ),
 );
 
-Zipper::getFileContent('mySuperPackage/composer.json');
+$zipper->getFileContent('mySuperPackage/composer.json');
 
-Zipper::make('test.zip')->extractTo('',array('mySuperPackage/composer.json'),Zipper::WHITELIST);
+$zipper->make('test.zip')->extractTo('',array('mySuperPackage/composer.json'),Zipper::WHITELIST);
 ```
 
 - You can easily chain most functions, except `getFileContent`, `getStatus`, `close` and `extractTo` which must come at the end of the chaine.
