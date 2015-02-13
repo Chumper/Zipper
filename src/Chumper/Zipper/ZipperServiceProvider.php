@@ -19,7 +19,7 @@ class ZipperServiceProvider extends ServiceProvider {
      */
     public function boot()
     {
-        $this->package('chumper/zipper');
+
     }
 
     /**
