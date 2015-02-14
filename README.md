@@ -6,9 +6,13 @@ This is a simple Wrapper around the ZipArchive methods with some handy functions
 
 ##Installation
 
-1- To install this package just require it in your
+1a- To install this package for laravel 5 just require it in your
 
-`composer.json` with `"Chumper/Zipper": "0.5.0"`
+`composer.json` with `"Chumper/Zipper": "0.6.0"`
+
+1b- To install this package for laravel 4 just require it in your
+
+`composer.json` with `"Chumper/Zipper": "0.5.1"`
 
 2- goto `app/config/app.php`
 
