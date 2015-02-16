@@ -360,7 +360,7 @@ class Zipper
         // Now let's visit the subdirectories and add them, too.
         foreach ($this->file->directories($pathToDir) as $dir) {
             $old_folder = $this->currentFolder;
-            $this->currentFolder = $this->currentFolder . '/' . basename($dir);
+            $this->currentFolder = empty($this->currentFolder) ? basename($dir) : $this->currentFolder . '/' . basename($dir);
             $this->addDir($pathToDir . '/' . basename($dir));
             $this->currentFolder = $old_folder;
         }
