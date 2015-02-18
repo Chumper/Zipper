@@ -8,11 +8,11 @@ This is a simple Wrapper around the ZipArchive methods with some handy functions
 
 1a- To install this package for laravel 5 just require it in your
 
-`composer.json` with `"Chumper/Zipper": "0.6.0"`
+`composer.json` with `"Chumper/Zipper": "0.6.x"`
 
 1b- To install this package for laravel 4 just require it in your
 
-`composer.json` with `"Chumper/Zipper": "0.5.1"`
+`composer.json` with `"Chumper/Zipper": "0.5.x"`
 
 2- goto `app/config/app.php`
 
