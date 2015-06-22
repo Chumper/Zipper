@@ -8,11 +8,11 @@ This is a simple Wrapper around the ZipArchive methods with some handy functions
 
 1a- To install this package for laravel 5 just require it in your
 
-`composer.json` with `"Chumper/Zipper": "0.6.x"`
+`composer.json` with `"chumper/zipper": "0.6.x"`
 
 1b- To install this package for laravel 4 just require it in your
 
-`composer.json` with `"Chumper/Zipper": "0.5.x"`
+`composer.json` with `"chumper/zipper": "0.5.x"`
 
 2- goto `app/config/app.php`
 
@@ -56,8 +56,7 @@ $zipper->make('test.zip')->extractTo('',array('mySuperPackage/composer.json'),Zi
 
 - You can easily chain most functions, except `getFileContent`, `getStatus`, `close` and `extractTo` which must come at the end of the chaine.
 
-The main reason i wrote this little package is the `extractTo` method since it allows you to be very flexible when extracting zips.
-So you can for example implement an update method which will just override the changed files.
+The main reason I wrote this little package is the `extractTo` method since it allows you to be very flexible when extracting zips. So you can for example implement an update method which will just override the changed files.
 
 
 ##Functions
@@ -144,7 +143,7 @@ Which will extract the `test.zip` into the `public` folder except the folder `ve
 
 ##Development
 
-May it is a goot idea to add other compress functions like rar, phar or bzip2 etc...
+Maybe it is a good idea to add other compress functions like rar, phar or bzip2 etc...
 Everything is setup for that, if you want just fork and develop further.
 
 If you need other functions or got errors, please leave an issue on github.
