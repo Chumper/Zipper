@@ -54,7 +54,7 @@ $zipper->getFileContent('mySuperPackage/composer.json');
 $zipper->make('test.zip')->extractTo('',array('mySuperPackage/composer.json'),Zipper::WHITELIST);
 ```
 
-- You can easily chain most functions, except `getFileContent`, `getStatus`, `close` and `extractTo` which must come at the end of the chaine.
+You can easily chain most functions, except `getFileContent`, `getStatus`, `close` and `extractTo` which must come at the end of the chain.
 
 The main reason I wrote this little package is the `extractTo` method since it allows you to be very flexible when extracting zips. So you can for example implement an update method which will just override the changed files.
 
@@ -143,7 +143,7 @@ Which will extract the `test.zip` into the `public` folder except the folder `ve
 
 ##Development
 
-Maybe it is a good idea to add other compress functions like rar, phar or bzip2 etc...
+Maybe it is a good idea to add other compression functions like rar, phar or bzip2 etc...
 Everything is setup for that, if you want just fork and develop further.
 
 If you need other functions or got errors, please leave an issue on github.
