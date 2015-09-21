@@ -6,23 +6,15 @@ This is a simple Wrapper around the ZipArchive methods with some handy functions
 
 ##Installation
 
-1a- To install this package for laravel 5 just require it in your
+1. Add this package to the list of required packages, inside `composer.json`
+  * for Laravel 5: `"chumper/zipper": "0.6.x"`
+  * for Laravel 4: `"chumper/zipper": "0.5.x"`
+2. Run `composer update`
 
-`composer.json` with `"chumper/zipper": "0.6.x"`
+3. Go to `app/config/app.php`
 
-1b- To install this package for laravel 4 just require it in your
-
-`composer.json` with `"chumper/zipper": "0.5.x"`
-
-2- goto `app/config/app.php`
-
-.add to providers
-
-    'Chumper\Zipper\ZipperServiceProvider'
-
-.add to aliases
-
-    'Zipper' => 'Chumper\Zipper\Zipper'
+  * add to providers `'Chumper\Zipper\ZipperServiceProvider'`
+  * add to aliases `'Zipper' => 'Chumper\Zipper\Zipper'`
 
 You can now access Zipper with the `Zipper` alias.
 
