@@ -113,7 +113,6 @@ class Zipper
      */
     public function extractTo($path, array $files = array(), $method = Zipper::BLACKLIST)
     {
-        $path = realpath($path);
         if (!$this->file->exists($path))
             $this->file->makeDirectory($path, 0755, true);
 
