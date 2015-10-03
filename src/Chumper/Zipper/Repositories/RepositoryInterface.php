@@ -33,6 +33,14 @@ interface RepositoryInterface
     public function addFile($pathToFile, $pathInArchive);
 
     /**
+     * Add an empty directory
+     *
+     * @param $dirName
+     * @return void
+     */
+    public function addEmptyDir($dirName);
+    
+    /**
      * Remove a file permanently from the Archive
      *
      * @param $pathInArchive
