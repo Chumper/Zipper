@@ -41,7 +41,18 @@ class ZipRepository implements RepositoryInterface
     {
         $this->archive->addFile($pathToFile, $pathInArchive);
     }
-	
+
+    /**
+     * Add an empty directory
+     *
+     * @param $dirName
+     * @return void
+     */
+    public function addEmptyDir($dirName)
+    {
+        $this->archive->addEmptyDir($dirName);
+    }
+    	
 	/**
      * Add a file to the opened Archive using its contents 
      *

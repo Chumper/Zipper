@@ -158,7 +158,20 @@ class Zipper
 
         return $this;
     }
-	
+
+    /**
+     * Add an empty directory
+     *
+     * @param $dirName
+     * @return void
+     */
+    public function addEmptyDir($dirName)
+    {
+        $this->repository->addEmptyDir($dirName);
+
+        return $this;
+    }
+    	
     /**
      * Add a file to the zip using its contents
      *
