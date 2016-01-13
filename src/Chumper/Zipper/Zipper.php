@@ -72,7 +72,7 @@ class Zipper
         if (is_subclass_of($name, 'Chumper\Zipper\Repositories\RepositoryInterface'))
             $this->repository = new $name($pathToFile, $new);
         else
-	        //TODO $type should be a class name and not a string
+            //TODO $type should be a class name and not a string
             $this->repository = $type;
 
         return $this;
@@ -173,12 +173,12 @@ class Zipper
 
         return $this;
     }
-    	
+
     /**
      * Add a file to the zip using its contents
      *
      * @param $filename string The name of the file to create
-	 * @param $content string The file contents
+     * @param $content string The file contents
      * @return $this Zipper instance
      */
     public function addString($filename, $content)
@@ -187,7 +187,7 @@ class Zipper
 
         return $this;
     }
-	
+
 
     /**
      * Gets the status of the zip.
@@ -227,6 +227,17 @@ class Zipper
     public function getFilePath()
     {
         return $this->filePath;
+    }
+
+    /**
+     * Sets the password to be used for decompressing
+     *
+     * @param $password
+     * @return boolean
+     */
+    public function usePassword($password)
+    {
+        return $this->repository->usePassword($password);
     }
 
     /**
@@ -397,18 +408,18 @@ class Zipper
 
         $this->repository->addFile($pathToAdd, $this->getInternalPath() . $fileName);
     }
-	
+
     /**
      * Add the file to the zip from content
      *
      * @param $filename
-	 * @param $content
+     * @param $content
      */
     private function addFromString($filename, $content)
     {
         $this->repository->addFromString($this->getInternalPath() . $filename, $content);
     }
-	
+
 
     /**
      * @param $path
@@ -430,13 +441,13 @@ class Zipper
             }
 
             $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-            
+
             // We need to create the directory first in case it doesn't exist
-			$full_path = $path . '/' . $tmpPath;
-			$dir = substr($full_path, 0, strrpos($full_path, '/'));
-			if(!is_dir($dir))
-				$self->getFileHandler()->makeDirectory($dir, 0777, true, true);
-            
+            $full_path = $path . '/' . $tmpPath;
+            $dir = substr($full_path, 0, strrpos($full_path, '/'));
+            if(!is_dir($dir))
+                $self->getFileHandler()->makeDirectory($dir, 0777, true, true);
+
             $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
 
         });
@@ -459,13 +470,13 @@ class Zipper
 
             if (starts_with($self->getInternalPath() . $fileName, $filesArray)) {
                 $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-                
+
                 // We need to create the directory first in case it doesn't exist
-				$full_path = $path . '/' . $tmpPath;
-				$dir = substr($full_path, 0, strrpos($full_path, '/'));
-				if(!is_dir($dir))
-					$self->getFileHandler()->makeDirectory($dir, 0777, true, true);
-					
+                $full_path = $path . '/' . $tmpPath;
+                $dir = substr($full_path, 0, strrpos($full_path, '/'));
+                if(!is_dir($dir))
+                    $self->getFileHandler()->makeDirectory($dir, 0777, true, true);
+
                 $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
             }
         });
