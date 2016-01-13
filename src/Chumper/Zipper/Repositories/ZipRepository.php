@@ -52,9 +52,9 @@ class ZipRepository implements RepositoryInterface
     {
         $this->archive->addEmptyDir($dirName);
     }
-    	
-	/**
-     * Add a file to the opened Archive using its contents 
+
+    /**
+     * Add a file to the opened Archive using its contents
      *
      * @param $name
      * @param $content
@@ -129,6 +129,18 @@ class ZipRepository implements RepositoryInterface
     public function fileExists($fileInArchive)
     {
         return $this->archive->locateName($fileInArchive) !== false;
+    }
+
+    /**
+     * Sets the password to be used for decompressing
+     * function named usePassword for clarity
+     *
+     * @param $password
+     * @return boolean
+     */
+    public function usePassword($password)
+    {
+        return $this->archive->setPassword($password);
     }
 
     /**

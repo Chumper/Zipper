@@ -39,7 +39,7 @@ interface RepositoryInterface
      * @return void
      */
     public function addEmptyDir($dirName);
-    
+
     /**
      * Remove a file permanently from the Archive
      *
@@ -80,6 +80,14 @@ interface RepositoryInterface
      * @return boolean
      */
     public function fileExists($fileInArchive);
+
+    /**
+     * Sets the password to be used for decompressing
+     *
+     * @param $password
+     * @return boolean
+     */
+    public function usePassword($password);
 
     /**
      * Returns the status of the archive as a string
