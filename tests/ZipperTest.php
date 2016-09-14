@@ -127,24 +127,45 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
     public function testExtractWhiteList()
     {
-        $this->file->shouldReceive('isFile')->with('foo')
-            ->andReturn(true);
+      $this->file
+        ->shouldReceive('isFile')
+        ->with('foo')
+        ->andReturn(true)
+      ;
 
-        $this->archive->add('foo');
+      $this->archive
+        ->add('foo')
+      ;
 
-        $this->file->shouldReceive('put')->with(realpath(NULL) . '/foo', 'foo');
+      $this->file
+        ->shouldReceive('put')
+        ->with(realpath(NULL) . '/foo', 'foo')
+      ;
 
-        $this->archive->extractTo('', array('foo'), Zipper::WHITELIST);
+      $this->archive
+        ->extractTo(getcwd(), array('foo'), Zipper::WHITELIST)
+      ;
 
-        //----
-        $this->file->shouldReceive('isFile')->with('foo')
-            ->andReturn(true);
 
-        $this->archive->folder('foo/bar')->add('foo');
+      $this->file
+        ->shouldReceive('isFile')
+        ->with('foo')
+        ->andReturn(true)
+      ;
 
-        $this->file->shouldReceive('put')->with(realpath(NULL) . '/foo', 'foo/bar/foo');
+      $this->archive
+        ->folder('foo/bar')
+        ->add('foo')
+      ;
 
-        $this->archive->extractTo('', array('foo'), Zipper::WHITELIST);
+      $this->file
+        ->shouldReceive('put')
+        ->with(realpath(NULL) . '/foo', 'foo/bar/foo')
+      ;
+
+      $this->archive
+        ->extractTo(getcwd(), array('foo'), Zipper::WHITELIST)
+      ;
 
     }
 
@@ -157,7 +178,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
         $this->file->shouldReceive('put')->with(realpath(NULL) . '/foo', 'foo');
 
-        $this->archive->extractTo('', array(), Zipper::BLACKLIST);
+        $this->archive->extractTo(getcwd(), array(), Zipper::BLACKLIST);
 
         //----
         $this->file->shouldReceive('isFile')->with('foo')
@@ -167,7 +188,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
         $this->file->shouldReceive('put')->with(realpath(NULL) . '/foo', 'foo/bar/foo');
 
-        $this->archive->extractTo('', array('foo'), Zipper::BLACKLIST);
+        $this->archive->extractTo(getcwd(), array('foo'), Zipper::BLACKLIST);
     }
 
     public function testNavigationFolderAndHome()

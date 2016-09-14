@@ -107,4 +107,25 @@ class ArrayArchive implements RepositoryInterface
     public function close()
     {
     }
+
+    /**
+     * Add an empty directory
+     *
+     * @param $dirName
+     * @return void
+     */
+    public function addEmptyDir($dirName){
+      # CODE...
+    }
+
+    /**
+     * Sets the password to be used for decompressing
+     *
+     * @param $password
+     * @return void
+     */
+    public function usePassword($password)
+    {
+      # CODE...
+    }
 }

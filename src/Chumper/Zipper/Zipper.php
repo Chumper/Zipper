@@ -103,6 +103,18 @@ class Zipper
     }
 
     /**
+     * Create a new rar file or open one
+     *
+     * @param $pathToFile
+     * @return $this
+     */
+    public function rar($pathToFile)
+    {
+        $this->make($pathToFile, 'rar');
+        return $this;
+    }
+
+    /**
      * Extracts the opened zip archive to the specified location <br/>
      * you can provide an array of files and folders and define if they should be a white list
      * or a black list to extract.
