@@ -82,6 +82,19 @@ Specify a folder to 'add files to' or 'remove files from' from the zip, example
 	Zipper::make('test.zip')->folder('test')->remove('composer.json');
 
 
+##listFiles($regexFilter = null)
+
+Lists all files within archive (if no filter pattern is provided). Use `$regexFilter` parameter to filter files. See [Pattern Syntax](http://php.net/manual/en/reference.pcre.pattern.syntax.php) for regular expression syntax 
+
+> NB: `listFiles` ignores folder set with `folder` function
+
+
+Example: Return all files/folders ending with '.log' pattern (case insensitive). This will return matches in sub folders and their sub folders also
+```php
+$files = Zipper::make('test.zip')->listFiles('/\.log$/i'); 
+```
+
+
 ##home()
 
 Resets the folder pointer.

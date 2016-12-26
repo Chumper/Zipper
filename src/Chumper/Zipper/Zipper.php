@@ -533,18 +533,33 @@ class Zipper
     }
 
     /**
-     * List files that are within the archive
+     * List all files that are within the archive
      *
+     * @param string|null $regexFilter regular expression to filter returned files/folders. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
      * @return array
+     * @throws \RuntimeException
      */
-    public function listFiles()
+    public function listFiles($regexFilter = null)
     {
         $filesList = array();
-        $this->repository->each(
-            function ($file) use (&$filesList) {
+        if ($regexFilter) {
+            $filter = function ($file) use (&$filesList, $regexFilter) {
+                $match = preg_match($regexFilter, $file);
+                if ($match === 1) {
+                    $filesList[] = $file;
+                } else if ($match === FALSE) {
+                    //invalid pattern for preg_match raises E_WARNING and returns FALSE
+                    //so if you have custom error_handler set to catch and throw E_WARNINGs you never end up here
+                    //but if you have not - this will throw exception
+                    throw new \RuntimeException("regular expression match on '$file' failed with error. Please check if pattern is valid regular expression.");
+                }
+            };
+        } else {
+            $filter = function ($file) use (&$filesList) {
                 $filesList[] = $file;
-            }
-        );
+            };
+        }
+        $this->repository->each($filter);
 
         return $filesList;
     }

@@ -397,4 +397,51 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('foo.file', 'bar.file', 'subDir/sub.file'), $this->archive->listFiles());
     }
+
+    public function testListFilesWithRegexFilter()
+    {
+        // add 2 files to root level in zip
+        $this->file->shouldReceive('isFile')->with('foo.file')->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('bar.log')->andReturn(true);
+
+        $this->archive
+            ->add('foo.file')
+            ->add('bar.log');
+
+        // add sub directory with 2 files inside
+        $this->file->shouldReceive('isFile')->with('/path/to/subDir')->andReturn(false);
+        $this->file->shouldReceive('isFile')->with('sub.file')->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('anotherSub.log')->andReturn(true);
+
+        $this->file->shouldReceive('files')->with('/path/to/subDir')->andReturn(array('sub.file', 'anotherSub.log'));
+        $this->file->shouldReceive('directories')->with('/path/to/subDir')->andReturn(array());
+
+        $this->archive->folder('subDir')->add('/path/to/subDir');
+
+        $this->assertEquals(
+            array('foo.file', 'subDir/sub.file'),
+            $this->archive->listFiles('/\.file$/i') // filter out files ending with ".file" pattern
+        );
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage regular expression match on 'foo.file' failed with error. Please check if pattern is valid regular expression.
+     */
+    public function testListFilesThrowsExceptionWithInvalidRegexFilter()
+    {
+        $this->file->shouldReceive('isFile')->with('foo.file')->andReturn(true);
+        $this->archive->add('foo.file');
+
+        PHPUnit_Framework_Error_Warning::$enabled = FALSE; // disable PhpUnit error_handler for warnings for a moment
+        try {
+            $this->assertEquals(
+                array('foo.file', 'subDir/sub.file'),
+                $this->archive->listFiles('asdasd') // invalid pattern
+            );
+        } catch (Exception $exception) {
+            PHPUnit_Framework_Error_Warning::$enabled = TRUE;
+            throw $exception;
+        }
+    }
 }
