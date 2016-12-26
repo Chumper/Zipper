@@ -38,6 +38,24 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $this->archive->getFilePath());
     }
 
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Failed to create folder
+     */
+    public function testMakeThrowsExceptionWhenCouldNotCreateDirectory()
+    {
+        $path = getcwd() . time();
+
+        $this->file->shouldReceive('makeDirectory')
+            ->with($path, 0755, true)
+            ->andReturn(false);
+
+        $zip = new Zipper($this->file);
+
+        $zip->make($path . DIRECTORY_SEPARATOR . 'createMe.zip');
+    }
+
     public function testAddAndGet()
     {
         $this->file->shouldReceive('isFile')->with('foo.bar')
@@ -157,19 +175,46 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(NULL) . '/foo', 'foo');
+            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'foo', 'foo');
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(NULL) . '/foo.log', 'foo.log');
+            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'foo.log', 'foo.log');
 
         $this->archive
             ->extractTo(getcwd(), array('foo'), Zipper::WHITELIST);
     }
 
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage Failed to create folder
+     */
+    public function testExtractToThrowsExceptionWhenCouldNotCreateDirectory()
+    {
+        $path = getcwd() . time();
+
+        $this->file
+            ->shouldReceive('isFile')
+            ->with('foo.log')
+            ->andReturn(true);
+
+        $this->file->shouldReceive('makeDirectory')
+            ->with($path, 0755, true)
+            ->andReturn(false);
+
+        $this->archive->add('foo.log');
+
+        $this->file->shouldNotReceive('put')
+            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'foo.log', 'foo.log');
+
+        $this->archive
+            ->extractTo($path, array('foo'), Zipper::WHITELIST);
+    }
+
     public function testExtractWhiteListFromSubDirectory()
     {
         $this->file->shouldReceive('isFile')->andReturn(true);
+        $this->file->shouldReceive('makeDirectory')->andReturn(true);
 
         $this->archive
             ->folder('foo/bar')
@@ -178,11 +223,11 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(NULL) . '/baz', 'foo/bar/baz');
+            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'baz', 'foo/bar/baz');
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(NULL) . '/baz.log', 'foo/bar/baz.log');
+            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'baz.log', 'foo/bar/baz.log');
 
         $this->archive
             ->extractTo(getcwd(), array('baz'), Zipper::WHITELIST);
@@ -191,6 +236,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
     public function testExtractWhiteListWithExactMatching()
     {
         $this->file->shouldReceive('isFile')->andReturn(true);
+        $this->file->shouldReceive('makeDirectory')->andReturn(true);
 
         $this->archive
             ->folder('foo/bar')
@@ -199,7 +245,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(NULL) . '/baz', 'foo/bar/baz');
+            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'baz', 'foo/bar/baz');
 
         $this->archive
             ->extractTo(getcwd(), array('baz'), Zipper::WHITELIST | Zipper::EXACT_MATCH);
@@ -220,7 +266,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(NULL) . '/subDirectory/bazInSubDirectory', 'foo/bar/subDirectory/bazInSubDirectory');
+            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'subDirectory/bazInSubDirectory', 'foo/bar/subDirectory/bazInSubDirectory');
 
         $this->archive
             ->extractTo(getcwd(), array('subDirectory/bazInSubDirectory'), Zipper::WHITELIST | Zipper::EXACT_MATCH);
@@ -232,6 +278,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
             ->andReturn(true);
         $this->file->shouldReceive('isFile')->with('bar')
             ->andReturn(true);
+        $this->file->shouldReceive('makeDirectory')->andReturn(true);
 
         $this->archive->add('foo')
             ->add('bar');
@@ -271,6 +318,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
     {
         $this->file->shouldReceive('isFile')->with('baz')
             ->andReturn(true);
+        $this->file->shouldReceive('makeDirectory')->andReturn(true);
 
         $this->file->shouldReceive('isFile')->with('baz.log')
             ->andReturn(true);

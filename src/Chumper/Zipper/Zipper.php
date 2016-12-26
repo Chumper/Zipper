@@ -141,8 +141,9 @@ class Zipper
      */
     public function extractTo($path, array $files = array(), $methodFlags = Zipper::BLACKLIST)
     {
-        if (!$this->file->exists($path))
-            $this->file->makeDirectory($path, 0755, true);
+        if (!$this->file->exists($path) && !$this->file->makeDirectory($path, 0755, true)) {
+            throw new \RuntimeException('Failed to create folder');
+        }
 
         if ($methodFlags & Zipper::EXACT_MATCH) {
             $matchingMethod = function ($haystack, $needles) {
@@ -284,7 +285,7 @@ class Zipper
      */
     public function close()
     {
-        if(!is_null($this->repository))
+        if (!is_null($this->repository))
             $this->repository->close();
         $this->filePath = "";
     }
@@ -317,7 +318,7 @@ class Zipper
      */
     public function delete()
     {
-        if(!is_null($this->repository))
+        if (!is_null($this->repository))
             $this->repository->close();
 
         $this->file->delete($this->filePath);
@@ -339,7 +340,7 @@ class Zipper
      */
     public function __destruct()
     {
-        if(!is_null($this->repository))
+        if (!is_null($this->repository))
             $this->repository->close();
     }
 
@@ -401,11 +402,11 @@ class Zipper
     {
 
         if (!$this->file->exists($pathToZip)) {
-            if (!$this->file->exists(dirname($pathToZip)))
-                $this->file->makeDirectory(dirname($pathToZip), 0755, true);
-
-            if (!$this->file->isWritable(dirname($pathToZip)))
+            if (!$this->file->exists(dirname($pathToZip)) && !$this->file->makeDirectory(dirname($pathToZip), 0755, true)) {
+                throw new \RuntimeException('Failed to create folder');
+            } else if (!$this->file->isWritable(dirname($pathToZip))) {
                 throw new Exception(sprintf('The path "%s" is not writeable', $pathToZip));
+            }
 
             return true;
         }
@@ -434,7 +435,8 @@ class Zipper
     /**
      * Add the file to the zip
      *
-     * @param $pathToAdd
+     * @param string $pathToAdd
+     * @param string $fileName
      */
     private function addFile($pathToAdd, $fileName = null)
     {
@@ -464,6 +466,7 @@ class Zipper
      * @param $path
      * @param $filesArray
      * @param callable $matchingMethod
+     * @throws \RuntimeException
      */
     private function extractWithBlackList($path, $filesArray, callable $matchingMethod)
     {
@@ -483,9 +486,9 @@ class Zipper
 
             // We need to create the directory first in case it doesn't exist
             $full_path = $path . DIRECTORY_SEPARATOR . $tmpPath;
-            $dir = substr($full_path, 0, strrpos($full_path, '/'));
-            if(!is_dir($dir)) {
-                $self->getFileHandler()->makeDirectory($dir, 0777, true, true);
+            $dir = substr($full_path, 0, strrpos($full_path, DIRECTORY_SEPARATOR));
+            if (!is_dir($dir) && !$self->getFileHandler()->makeDirectory($dir, 0777, true, true)) {
+                throw new \RuntimeException('Failed to create folders');
             }
 
             $toPath = $path . DIRECTORY_SEPARATOR . $tmpPath;
@@ -499,6 +502,7 @@ class Zipper
      * @param $path
      * @param $filesArray
      * @param callable $matchingMethod
+     * @throws \RuntimeException
      */
     private function extractWithWhiteList($path, $filesArray, callable $matchingMethod)
     {
@@ -517,12 +521,13 @@ class Zipper
                 // We need to create the directory first in case it doesn't exist
                 $full_path = $path . DIRECTORY_SEPARATOR . $tmpPath;
                 $dir = substr($full_path, 0, strrpos($full_path, DIRECTORY_SEPARATOR));
-                if(!is_dir($dir)) {
-                    //FIXME check return boolean | force=true does not necessarily create directory. e.g. lack of privileges/$dir is not a valid string for directory
-                    $self->getFileHandler()->makeDirectory($dir, 0777, true, true);
+                if (!is_dir($dir) && !$self->getFileHandler()->makeDirectory($dir, 0777, true, true)) {
+                    throw new \RuntimeException('Failed to create folders');
                 }
 
-                $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
+                $toPath = $path . DIRECTORY_SEPARATOR . $tmpPath;
+                $fileStream = $self->getRepository()->getFileStream($oriName);
+                $self->getFileHandler()->put($toPath, $fileStream);
             }
         });
     }
