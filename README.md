@@ -89,9 +89,11 @@ Lists all files within archive (if no filter pattern is provided). Use `$regexFi
 > NB: `listFiles` ignores folder set with `folder` function
 
 
-Example: Return all files/folders ending with '.log' pattern (case insensitive). This will return matches in sub folders and their sub folders also
+Example: Return all files/folders ending/not ending with '.log' pattern (case insensitive). This will return matches in sub folders and their sub folders also
+
 ```php
-$files = Zipper::make('test.zip')->listFiles('/\.log$/i'); 
+$logFiles = Zipper::make('test.zip')->listFiles('/\.log$/i'); 
+$notLogFiles = Zipper::make('test.zip')->listFiles('/^(?!.*\.log).*$/i'); 
 ```
 
 
