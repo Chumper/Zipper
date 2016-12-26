@@ -174,6 +174,20 @@ test.zip
     |- fileInSubFolder.log
 ```
 
+##extractMatchingRegex($path, $regex)
+
+Extracts the content of the zip archive matching regular expression to the specified location. See [Pattern Syntax](http://php.net/manual/en/reference.pcre.pattern.syntax.php) for regular expression syntax.
+
+Example: extract all files ending with `.php` from `src` folder and its sub folders.
+```php
+Zipper::make('test.zip')->folder->('src')->extractMatchingRegex($path, '/\.php$/i'); 
+```
+
+Example: extract all files **except** those ending with `test.php` from `src` folder and its sub folders.
+```php
+Zipper::make('test.zip')->folder->('src')->extractMatchingRegex($path, '/^(?!.*test\.php).*$/i'); 
+```
+
 #Development
 
 Maybe it is a good idea to add other compression functions like rar, phar or bzip2 etc...

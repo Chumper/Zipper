@@ -332,6 +332,45 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $this->archive->extractTo(getcwd(), array('baz'), Zipper::BLACKLIST | Zipper::EXACT_MATCH);
     }
 
+    public function testExtractMatchingRegexFromSubFolder()
+    {
+        $this->file->shouldReceive('isFile')->with('baz')->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('baz.log')->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('subFolderFileToIgnore')->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('subFolderFileToExtract.log')->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('rootLevelMustBeIgnored.log')->andReturn(true);
+
+        $this->file->shouldReceive('makeDirectory')->andReturn(true);
+
+
+        $this->archive->add('rootLevelMustBeIgnored.log');
+
+        $this->archive->folder('foo/bar/subFolder')
+            ->add('subFolderFileToIgnore')
+            ->add('subFolderFileToExtract.log');
+
+        $this->archive->folder('foo/bar')
+            ->add('baz')
+            ->add('baz.log');
+
+        $this->file->shouldReceive('put')->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'baz.log', 'foo/bar/baz.log');
+        $this->file->shouldReceive('put')->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'subFolder/subFolderFileToExtract.log', 'foo/bar/subFolder/subFolderFileToExtract.log');
+        $this->file->shouldNotReceive('put')->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'rootLevelMustBeIgnored.log', 'rootLevelMustBeIgnored.log');
+        $this->file->shouldNotReceive('put')->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'baz', 'foo/bar/baz');
+        $this->file->shouldNotReceive('put')->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'subFolder/subFolderFileToIgnore', 'foo/bar/subFolder/subFolderFileToIgnore');
+
+        $this->archive->extractMatchingRegex(getcwd(), '/\.log$/i');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Missing pass valid regex parameter
+     */
+    public function testExtractMatchingRegexThrowsExceptionWhenRegexIsEmpty()
+    {
+        $this->archive->extractMatchingRegex(getcwd(), '');
+    }
+
     public function testNavigationFolderAndHome()
     {
         $this->archive->folder('foo/bar');

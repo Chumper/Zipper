@@ -146,20 +146,48 @@ class Zipper
         }
 
         if ($methodFlags & Zipper::EXACT_MATCH) {
-            $matchingMethod = function ($haystack, $needles) {
-                return in_array($haystack, $needles, true);
+            $matchingMethod = function ($haystack) use ($files) {
+                return in_array($haystack, $files, true);
             };
         } else {
-            $matchingMethod = function ($haystack, $needles) {
-                return starts_with($haystack, $needles);
+            $matchingMethod = function ($haystack)  use ($files) {
+                return starts_with($haystack, $files);
             };
         }
 
         if ($methodFlags & Zipper::WHITELIST) {
-            $this->extractWithWhiteList($path, $files, $matchingMethod);
+            $this->extractFilesInternal($path, $matchingMethod);
         } else {
-            $this->extractWithBlackList($path, $files, $matchingMethod);
+            // blacklist - extract files that do not match with $matchingMethod
+            $this->extractFilesInternal($path, function ($filename) use ($matchingMethod) {
+                return !$matchingMethod($filename);
+            });
         }
+    }
+
+    /**
+     * Extracts matching files/folders from the opened zip archive to the specified location.
+     *
+     * @param string $extractToPath The path to extract to
+     * @param string $regex regular expression used to match files. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
+     */
+    public function extractMatchingRegex($extractToPath, $regex) {
+        if (empty($regex)) {
+            throw new \InvalidArgumentException('Missing pass valid regex parameter');
+        }
+
+        $this->extractFilesInternal($extractToPath, function ($filename) use ($regex) {
+            $match = preg_match($regex, $filename);
+            if ($match === 1) {
+                return TRUE;
+            } else if ($match === FALSE) {
+                //invalid pattern for preg_match raises E_WARNING and returns FALSE
+                //so if you have custom error_handler set to catch and throw E_WARNINGs you never end up here
+                //but if you have not - this will throw exception
+                throw new \RuntimeException("regular expression match on '$filename' failed with error. Please check if pattern is valid regular expression.");
+            }
+            return FALSE;
+        });
     }
 
     /**
@@ -461,75 +489,40 @@ class Zipper
         $this->repository->addFromString($this->getInternalPath() . $filename, $content);
     }
 
-
-    /**
-     * @param $path
-     * @param $filesArray
-     * @param callable $matchingMethod
-     * @throws \RuntimeException
-     */
-    private function extractWithBlackList($path, $filesArray, callable $matchingMethod)
+    private function extractFilesInternal($path, callable $matchingMethod)
     {
         $self = $this;
-        $this->repository->each(function ($fileName) use ($path, $filesArray, $matchingMethod, $self) {
-            $oriName = $fileName;
-
+        $this->repository->each(function ($fileName) use ($path, $matchingMethod, $self) {
             $currentPath = $self->getCurrentFolderPath();
             if (!empty($currentPath) && !starts_with($fileName, $currentPath)) {
                 return;
             }
 
-            $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-            if ($matchingMethod($tmpPath, $filesArray)) {
-                return;
+            $filename = str_replace($self->getInternalPath(), '', $fileName);
+            if ($matchingMethod($filename)) {
+                $self->extractOneFileInternal($fileName, $path);
             }
-
-            // We need to create the directory first in case it doesn't exist
-            $full_path = $path . DIRECTORY_SEPARATOR . $tmpPath;
-            $dir = substr($full_path, 0, strrpos($full_path, DIRECTORY_SEPARATOR));
-            if (!is_dir($dir) && !$self->getFileHandler()->makeDirectory($dir, 0777, true, true)) {
-                throw new \RuntimeException('Failed to create folders');
-            }
-
-            $toPath = $path . DIRECTORY_SEPARATOR . $tmpPath;
-            $fileStream = $self->getRepository()->getFileStream($oriName);
-            $self->getFileHandler()->put($toPath, $fileStream);
-
         });
     }
 
     /**
+     * @param $fileName
      * @param $path
-     * @param $filesArray
-     * @param callable $matchingMethod
-     * @throws \RuntimeException
      */
-    private function extractWithWhiteList($path, $filesArray, callable $matchingMethod)
+    private function extractOneFileInternal($fileName, $path)
     {
-        $self = $this;
-        $this->repository->each(function ($fileName) use ($path, $filesArray, $matchingMethod, $self) {
-            $oriName = $fileName;
+        $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
 
-            $currentPath = $self->getCurrentFolderPath();
-            if (!empty($currentPath) && !starts_with($fileName, $currentPath))
-                return;
+        // We need to create the directory first in case it doesn't exist
+        $full_path = $path . DIRECTORY_SEPARATOR . $tmpPath;
+        $dir = substr($full_path, 0, strrpos($full_path, DIRECTORY_SEPARATOR));
+        if (!is_dir($dir) && !$this->getFileHandler()->makeDirectory($dir, 0777, true, true)) {
+            throw new \RuntimeException('Failed to create folders');
+        }
 
-            $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-            if ($matchingMethod($tmpPath, $filesArray)) {
-                $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-
-                // We need to create the directory first in case it doesn't exist
-                $full_path = $path . DIRECTORY_SEPARATOR . $tmpPath;
-                $dir = substr($full_path, 0, strrpos($full_path, DIRECTORY_SEPARATOR));
-                if (!is_dir($dir) && !$self->getFileHandler()->makeDirectory($dir, 0777, true, true)) {
-                    throw new \RuntimeException('Failed to create folders');
-                }
-
-                $toPath = $path . DIRECTORY_SEPARATOR . $tmpPath;
-                $fileStream = $self->getRepository()->getFileStream($oriName);
-                $self->getFileHandler()->put($toPath, $fileStream);
-            }
-        });
+        $toPath = $path . DIRECTORY_SEPARATOR . $tmpPath;
+        $fileStream = $this->getRepository()->getFileStream($fileName);
+        $this->getFileHandler()->put($toPath, $fileStream);
     }
 
     /**
