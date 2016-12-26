@@ -120,29 +120,36 @@ white listed
 
 >**Zipper::WHITELIST**
 
-```Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::WHITELIST);```
+```php
+Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::WHITELIST);
+```
 
 Which will extract the `test.zip` into the `public` folder but **only** files/folders starting with `vendor` prefix inside the zip will be extracted.
 
 or black listed
 
 >**Zipper::BLACKLIST**
+Which will extract the `test.zip` into the `public` folder except files/folders starting with `vendor` prefix inside the zip will not be extracted.
 
-```Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::BLACKLIST);```
 
-> Which will extract the `test.zip` into the `public` folder except files/folders starting with `vendor` prefix inside the zip will not be extracted.
-
+```php
+Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::BLACKLIST);
+```
 
 >**Zipper::EXACT_MATCH**
 
-```Zipper::make('test.zip')->folder('vendor')->extractTo('public', array('composer', 'bin/phpunit'), Zipper::WHITELIST | Zipper::EXACT_MATCH);```
+```php
+Zipper::make('test.zip')
+    ->folder('vendor')
+    ->extractTo('public', array('composer', 'bin/phpunit'), Zipper::WHITELIST | Zipper::EXACT_MATCH);
+```
 
 Which will extract the `test.zip` into the `public` folder but **only** files/folders **exact matching names**. So this will:
  * extract file or folder named `composer` in folder named `vendor` inside zip to `public` resulting `public/composer`
  * extract file or folder named `bin/phpunit` in `vendor/bin/phpunit` folder inside zip to `public` resulting `public/bin/phpunit`
 
-> **NB: extracting files/folder from zip without setting Zipper::EXACT_MATCH 
-> would whitelist/blacklist both files and folder if only `test.bat` is given as whitelist/blacklist argument when zip has similar structure
+> **NB:** extracting files/folder from zip without setting Zipper::EXACT_MATCH 
+> When zip has similar structure as below and only `test.bat` is given as whitelist/blacklist argument then `extractTo` would extract all those files and folders as they all start with given string
 
 ```
 test.zip
@@ -151,7 +158,6 @@ test.zip
  |- test.bat/
     |- fileInSubFolder.log
 ```
-
 
 #Development
 
