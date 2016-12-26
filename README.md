@@ -25,7 +25,7 @@ Zipper::make('public/test.zip')->add($files);
 ```
 - by default the package will create the `test.zip` in the project route folder but in the example above we changed it to `project_route/public/`.
 
-####Another example
+##Another example
 ```php
 $zipper = new \Chumper\Zipper\Zipper;
 
@@ -51,30 +51,30 @@ You can easily chain most functions, except `getFileContent`, `getStatus`, `clos
 The main reason I wrote this little package is the `extractTo` method since it allows you to be very flexible when extracting zips. So you can for example implement an update method which will just override the changed files.
 
 
-##Functions
+#Functions
 
-**make($pathToFile)**
+##make($pathToFile)
 
 `Create` or `Open` a zip archive; if the file does not exists it will create a new one.
 It will return the Zipper instance so you can chain easily.
 
 
-**add($files/folder)**
+##add($files/folder)
 
 You can add and array of Files, or a Folder which all the files in that folder will then be added, so from the first example we could instead do something like `$files = 'public/files/';`.
 
 
-**addString($filename, $content)**
+##addString($filename, $content)
 
 add a single file to the zip by specifying a name and content as strings.
 
 
-**remove($file/s)**
+##remove($file/s)
 
 removes a single file or an array of files from the zip.
 
 
-**folder($folder)**
+##folder($folder)
 
 Specify a folder to 'add files to' or 'remove files from' from the zip, example
 
@@ -82,32 +82,31 @@ Specify a folder to 'add files to' or 'remove files from' from the zip, example
 	Zipper::make('test.zip')->folder('test')->remove('composer.json');
 
 
-**home()**
+##home()
 
 Resets the folder pointer.
 
-
-**zip($fileName)**
+##zip($fileName)
 
 Uses the ZipRepository for file handling.
 
 
-**getFileContent($filePath)**
+##getFileContent($filePath)
 
 get the content of a file in the zip. This will return the content or false.
 
 
-**getStatus()**
+##getStatus()
 
 get the opening status of the zip as integer.
 
 
-**close()**
+##close()
 
 closes the zip and writes all changes.
 
 
-**extractTo($path)**
+##extractTo($path)
 
 Extracts the content of the zip archive to the specified location, for example
 
@@ -120,26 +119,31 @@ This command is really nice to get just a part of the zip file, you can also pas
 white listed
 
 >**Zipper::WHITELIST**
->
-	Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::WHITELIST);
+
+```Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::WHITELIST);```
+
 Which will extract the `test.zip` into the `public` folder but **only** files/folders starting with `vendor` prefix inside the zip will be extracted.
 
 or black listed
 
 >**Zipper::BLACKLIST**
->
-	Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::BLACKLIST);
-Which will extract the `test.zip` into the `public` folder except files/folders starting with `vendor` prefix inside the zip will not be extracted.
+
+```Zipper::make('test.zip')->extractTo('public', array('vendor'), Zipper::BLACKLIST);```
+
+> Which will extract the `test.zip` into the `public` folder except files/folders starting with `vendor` prefix inside the zip will not be extracted.
+
 
 >**Zipper::EXACT_MATCH**
->
-	Zipper::make('test.zip')->folder('vendor')->extractTo('public', array('composer', 'bin/phpunit'), Zipper::WHITELIST | Zipper::EXACT_MATCH);
+
+```Zipper::make('test.zip')->folder('vendor')->extractTo('public', array('composer', 'bin/phpunit'), Zipper::WHITELIST | Zipper::EXACT_MATCH);```
+
 Which will extract the `test.zip` into the `public` folder but **only** files/folders **exact matching names**. So this will:
  * extract file or folder named `composer` in folder named `vendor` inside zip to `public` resulting `public/composer`
  * extract file or folder named `bin/phpunit` in `vendor/bin/phpunit` folder inside zip to `public` resulting `public/bin/phpunit`
 
 > **NB: extracting files/folder from zip without setting Zipper::EXACT_MATCH 
 > would whitelist/blacklist both files and folder if only `test.bat` is given as whitelist/blacklist argument when zip has similar structure
+
 ```
 test.zip
  |- test.bat
@@ -149,7 +153,7 @@ test.zip
 ```
 
 
-##Development
+#Development
 
 Maybe it is a good idea to add other compression functions like rar, phar or bzip2 etc...
 Everything is setup for that, if you want just fork and develop further.
