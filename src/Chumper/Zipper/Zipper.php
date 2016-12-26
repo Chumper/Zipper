@@ -25,6 +25,11 @@ class Zipper
     const BLACKLIST = 2;
 
     /**
+     * Constant for matching only strictly equal file names
+     */
+    const EXACT_MATCH = 4;
+
+    /**
      * @var string Represents the current location in the archive
      */
     private $currentFolder = '';
@@ -62,18 +67,28 @@ class Zipper
      * @param RepositoryInterface|string $type The type of the archive, defaults to zip, possible are zip, phar
      *
      * @return $this Zipper instance
+     * @throws \Exception
+     * @throws \InvalidArgumentException
      */
     public function make($pathToFile, $type = 'zip')
     {
         $new = $this->createArchiveFile($pathToFile);
         $this->filePath = $pathToFile;
 
-        $name = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
-        if (is_subclass_of($name, 'Chumper\Zipper\Repositories\RepositoryInterface'))
-            $this->repository = new $name($pathToFile, $new);
-        else
-            //TODO $type should be a class name and not a string
+        $objectOrName = $type;
+        if (is_string($type)) {
+            $objectOrName = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
+        }
+
+        if (!is_subclass_of($objectOrName, 'Chumper\Zipper\Repositories\RepositoryInterface')) {
+            throw new \InvalidArgumentException("Class for '{$objectOrName}' must implement RepositoryInterface interface");
+        }
+
+        if (is_string($objectOrName)) {
+            $this->repository = new $objectOrName($pathToFile, $new);
+        } else {
             $this->repository = $type;
+        }
 
         return $this;
     }
@@ -117,21 +132,62 @@ class Zipper
     /**
      * Extracts the opened zip archive to the specified location <br/>
      * you can provide an array of files and folders and define if they should be a white list
-     * or a black list to extract.
+     * or a black list to extract. By default this method compares file names using "string starts with" logic
      *
      * @param $path string The path to extract to
      * @param array $files An array of files
-     * @param int $method The Method the files should be treated
+     * @param int $methodFlags The Method the files should be treated
+     * @throws \Exception
      */
-    public function extractTo($path, array $files = array(), $method = Zipper::BLACKLIST)
+    public function extractTo($path, array $files = array(), $methodFlags = Zipper::BLACKLIST)
     {
-        if (!$this->file->exists($path))
-            $this->file->makeDirectory($path, 0755, true);
+        if (!$this->file->exists($path) && !$this->file->makeDirectory($path, 0755, true)) {
+            throw new \RuntimeException('Failed to create folder');
+        }
 
-        if ($method == Zipper::WHITELIST)
-            $this->extractWithWhiteList($path, $files);
-        else
-            $this->extractWithBlackList($path, $files);
+        if ($methodFlags & Zipper::EXACT_MATCH) {
+            $matchingMethod = function ($haystack) use ($files) {
+                return in_array($haystack, $files, true);
+            };
+        } else {
+            $matchingMethod = function ($haystack)  use ($files) {
+                return starts_with($haystack, $files);
+            };
+        }
+
+        if ($methodFlags & Zipper::WHITELIST) {
+            $this->extractFilesInternal($path, $matchingMethod);
+        } else {
+            // blacklist - extract files that do not match with $matchingMethod
+            $this->extractFilesInternal($path, function ($filename) use ($matchingMethod) {
+                return !$matchingMethod($filename);
+            });
+        }
+    }
+
+    /**
+     * Extracts matching files/folders from the opened zip archive to the specified location.
+     *
+     * @param string $extractToPath The path to extract to
+     * @param string $regex regular expression used to match files. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
+     */
+    public function extractMatchingRegex($extractToPath, $regex) {
+        if (empty($regex)) {
+            throw new \InvalidArgumentException('Missing pass valid regex parameter');
+        }
+
+        $this->extractFilesInternal($extractToPath, function ($filename) use ($regex) {
+            $match = preg_match($regex, $filename);
+            if ($match === 1) {
+                return TRUE;
+            } else if ($match === FALSE) {
+                //invalid pattern for preg_match raises E_WARNING and returns FALSE
+                //so if you have custom error_handler set to catch and throw E_WARNINGs you never end up here
+                //but if you have not - this will throw exception
+                throw new \RuntimeException("regular expression match on '$filename' failed with error. Please check if pattern is valid regular expression.");
+            }
+            return FALSE;
+        });
     }
 
     /**
@@ -257,7 +313,7 @@ class Zipper
      */
     public function close()
     {
-        if(!is_null($this->repository))
+        if (!is_null($this->repository))
             $this->repository->close();
         $this->filePath = "";
     }
@@ -290,7 +346,7 @@ class Zipper
      */
     public function delete()
     {
-        if(!is_null($this->repository))
+        if (!is_null($this->repository))
             $this->repository->close();
 
         $this->file->delete($this->filePath);
@@ -312,7 +368,7 @@ class Zipper
      */
     public function __destruct()
     {
-        if(!is_null($this->repository))
+        if (!is_null($this->repository))
             $this->repository->close();
     }
 
@@ -374,11 +430,11 @@ class Zipper
     {
 
         if (!$this->file->exists($pathToZip)) {
-            if (!$this->file->exists(dirname($pathToZip)))
-                $this->file->makeDirectory(dirname($pathToZip), 0755, true);
-
-            if (!$this->file->isWritable(dirname($pathToZip)))
+            if (!$this->file->exists(dirname($pathToZip)) && !$this->file->makeDirectory(dirname($pathToZip), 0755, true)) {
+                throw new \RuntimeException('Failed to create folder');
+            } else if (!$this->file->isWritable(dirname($pathToZip))) {
                 throw new Exception(sprintf('The path "%s" is not writeable', $pathToZip));
+            }
 
             return true;
         }
@@ -407,7 +463,8 @@ class Zipper
     /**
      * Add the file to the zip
      *
-     * @param $pathToAdd
+     * @param string $pathToAdd
+     * @param string $fileName
      */
     private function addFile($pathToAdd, $fileName = null)
     {
@@ -432,81 +489,70 @@ class Zipper
         $this->repository->addFromString($this->getInternalPath() . $filename, $content);
     }
 
-
-    /**
-     * @param $path
-     * @param $filesArray
-     * @throws \Exception
-     */
-    private function extractWithBlackList($path, $filesArray)
+    private function extractFilesInternal($path, callable $matchingMethod)
     {
         $self = $this;
-        $this->repository->each(function ($fileName) use ($path, $filesArray, $self) {
-            $oriName = $fileName;
-
+        $this->repository->each(function ($fileName) use ($path, $matchingMethod, $self) {
             $currentPath = $self->getCurrentFolderPath();
-            if (!empty($currentPath) && !starts_with($fileName, $currentPath))
-                return;
-
-            if (starts_with($fileName, $filesArray)) {
+            if (!empty($currentPath) && !starts_with($fileName, $currentPath)) {
                 return;
             }
 
-            $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-
-            // We need to create the directory first in case it doesn't exist
-            $full_path = $path . '/' . $tmpPath;
-            $dir = substr($full_path, 0, strrpos($full_path, '/'));
-            if(!is_dir($dir))
-                $self->getFileHandler()->makeDirectory($dir, 0777, true, true);
-
-            $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
-
-        });
-    }
-
-    /**
-     * @param $path
-     * @param $filesArray
-     * @throws \Exception
-     */
-    private function extractWithWhiteList($path, $filesArray)
-    {
-        $self = $this;
-        $this->repository->each(function ($fileName) use ($path, $filesArray, $self) {
-            $oriName = $fileName;
-
-            $currentPath = $self->getCurrentFolderPath();
-            if (!empty($currentPath) && !starts_with($fileName, $currentPath))
-                return;
-
-            if (starts_with($self->getInternalPath() . $fileName, $filesArray)) {
-                $tmpPath = str_replace($self->getInternalPath(), '', $fileName);
-
-                // We need to create the directory first in case it doesn't exist
-                $full_path = $path . '/' . $tmpPath;
-                $dir = substr($full_path, 0, strrpos($full_path, '/'));
-                if(!is_dir($dir))
-                    $self->getFileHandler()->makeDirectory($dir, 0777, true, true);
-
-                $self->getFileHandler()->put($path . '/' . $tmpPath, $self->getRepository()->getFileStream($oriName));
+            $filename = str_replace($self->getInternalPath(), '', $fileName);
+            if ($matchingMethod($filename)) {
+                $self->extractOneFileInternal($fileName, $path);
             }
         });
     }
 
     /**
-     * List files that are within the archive
+     * @param $fileName
+     * @param $path
+     */
+    private function extractOneFileInternal($fileName, $path)
+    {
+        $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
+
+        // We need to create the directory first in case it doesn't exist
+        $full_path = $path . DIRECTORY_SEPARATOR . $tmpPath;
+        $dir = substr($full_path, 0, strrpos($full_path, DIRECTORY_SEPARATOR));
+        if (!is_dir($dir) && !$this->getFileHandler()->makeDirectory($dir, 0777, true, true)) {
+            throw new \RuntimeException('Failed to create folders');
+        }
+
+        $toPath = $path . DIRECTORY_SEPARATOR . $tmpPath;
+        $fileStream = $this->getRepository()->getFileStream($fileName);
+        $this->getFileHandler()->put($toPath, $fileStream);
+    }
+
+    /**
+     * List all files that are within the archive
      *
+     * @param string|null $regexFilter regular expression to filter returned files/folders. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
      * @return array
+     * @throws \RuntimeException
      */
-    public function listFiles()
+    public function listFiles($regexFilter = null)
     {
         $filesList = array();
-        $this->repository->each(
-            function ($file) use (&$filesList) {
+        if ($regexFilter) {
+            $filter = function ($file) use (&$filesList, $regexFilter) {
+                $match = preg_match($regexFilter, $file);
+                if ($match === 1) {
+                    $filesList[] = $file;
+                } else if ($match === FALSE) {
+                    //invalid pattern for preg_match raises E_WARNING and returns FALSE
+                    //so if you have custom error_handler set to catch and throw E_WARNINGs you never end up here
+                    //but if you have not - this will throw exception
+                    throw new \RuntimeException("regular expression match on '$file' failed with error. Please check if pattern is valid regular expression.");
+                }
+            };
+        } else {
+            $filter = function ($file) use (&$filesList) {
                 $filesList[] = $file;
-            }
-        );
+            };
+        }
+        $this->repository->each($filter);
 
         return $filesList;
     }

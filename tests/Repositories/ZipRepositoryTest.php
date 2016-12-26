@@ -36,7 +36,7 @@ class ZipRepositoryTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException Exception
-     * @expectedExceptionMessage Error: Failed to open idonotexist.zip! Error: ZipArchive::ER_OPEN - Can't open file.
+     * @expectedExceptionMessage Error: Failed to open idonotexist.zip! Error: ZipArchive::ER_
      */
     public function testOpenNonExistentZipThrowsException()
     {
