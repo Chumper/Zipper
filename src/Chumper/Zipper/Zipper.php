@@ -50,11 +50,16 @@ class Zipper
     private $filePath;
 
     /**
+     * @var int The permission mode used to create files and folders
+     */
+    private $permissionMode = 0755;
+
+    /**
      * Constructor
      *
      * @param Filesystem $fs
      */
-    function __construct(Filesystem $fs = null)
+    public function __construct(Filesystem $fs = null)
     {
         $this->file = $fs ? $fs : new Filesystem();
     }
@@ -67,6 +72,7 @@ class Zipper
      * @param RepositoryInterface|string $type The type of the archive, defaults to zip, possible are zip, phar
      *
      * @return $this Zipper instance
+     * @throws \RuntimeException
      * @throws \Exception
      * @throws \InvalidArgumentException
      */
@@ -84,10 +90,9 @@ class Zipper
             throw new \InvalidArgumentException("Class for '{$objectOrName}' must implement RepositoryInterface interface");
         }
 
+        $this->repository = $type;
         if (is_string($objectOrName)) {
             $this->repository = new $objectOrName($pathToFile, $new);
-        } else {
-            $this->repository = $type;
         }
 
         return $this;
@@ -98,6 +103,7 @@ class Zipper
      *
      * @param $pathToFile
      * @return $this
+     * @throws \Exception
      */
     public function zip($pathToFile)
     {
@@ -110,6 +116,7 @@ class Zipper
      *
      * @param $pathToFile
      * @return $this
+     * @throws \Exception
      */
     public function phar($pathToFile)
     {
@@ -122,6 +129,7 @@ class Zipper
      *
      * @param $pathToFile
      * @return $this
+     * @throws \Exception
      */
     public function rar($pathToFile)
     {
@@ -141,7 +149,7 @@ class Zipper
      */
     public function extractTo($path, array $files = array(), $methodFlags = Zipper::BLACKLIST)
     {
-        if (!$this->file->exists($path) && !$this->file->makeDirectory($path, 0755, true)) {
+        if (!$this->file->exists($path) && !$this->file->makeDirectory($path, $this->permissionMode, true)) {
             throw new \RuntimeException('Failed to create folder');
         }
 
@@ -150,7 +158,7 @@ class Zipper
                 return in_array($haystack, $files, true);
             };
         } else {
-            $matchingMethod = function ($haystack)  use ($files) {
+            $matchingMethod = function ($haystack) use ($files) {
                 return starts_with($haystack, $files);
             };
         }
@@ -170,8 +178,11 @@ class Zipper
      *
      * @param string $extractToPath The path to extract to
      * @param string $regex regular expression used to match files. See @link http://php.net/manual/en/reference.pcre.pattern.syntax.php
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
-    public function extractMatchingRegex($extractToPath, $regex) {
+    public function extractMatchingRegex($extractToPath, $regex)
+    {
         if (empty($regex)) {
             throw new \InvalidArgumentException('Missing pass valid regex parameter');
         }
@@ -233,7 +244,7 @@ class Zipper
      * Add an empty directory
      *
      * @param $dirName
-     * @return void
+     * @return Zipper
      */
     public function addEmptyDir($dirName)
     {
@@ -313,9 +324,10 @@ class Zipper
      */
     public function close()
     {
-        if (!is_null($this->repository))
+        if (null !== $this->repository) {
             $this->repository->close();
-        $this->filePath = "";
+        }
+        $this->filePath = '';
     }
 
     /**
@@ -346,11 +358,12 @@ class Zipper
      */
     public function delete()
     {
-        if (!is_null($this->repository))
+        if (null !== $this->repository) {
             $this->repository->close();
+        }
 
         $this->file->delete($this->filePath);
-        $this->filePath = "";
+        $this->filePath = '';
     }
 
     /**
@@ -368,8 +381,9 @@ class Zipper
      */
     public function __destruct()
     {
-        if (!is_null($this->repository))
+        if (null !== $this->repository) {
             $this->repository->close();
+        }
     }
 
     /**
@@ -379,6 +393,19 @@ class Zipper
      */
     public function getCurrentFolderPath()
     {
+        return $this->currentFolder;
+    }
+
+    private function getCurrentFolderWithTrailingSlash()
+    {
+        if (empty($this->currentFolder)) {
+            return '';
+        }
+
+        $lastChar = mb_substr($this->currentFolder, -1);
+        if ($lastChar !== '/' || $lastChar !== '\\') {
+            return $this->currentFolder . '/';
+        }
         return $this->currentFolder;
     }
 
@@ -430,9 +457,10 @@ class Zipper
     {
 
         if (!$this->file->exists($pathToZip)) {
-            if (!$this->file->exists(dirname($pathToZip)) && !$this->file->makeDirectory(dirname($pathToZip), 0755, true)) {
+            $dirname = dirname($pathToZip);
+            if (!$this->file->exists($dirname) && !$this->file->makeDirectory($dirname, $this->permissionMode, true)) {
                 throw new \RuntimeException('Failed to create folder');
-            } else if (!$this->file->isWritable(dirname($pathToZip))) {
+            } else if (!$this->file->isWritable($dirname)) {
                 throw new Exception(sprintf('The path "%s" is not writeable', $pathToZip));
             }
 
@@ -493,7 +521,7 @@ class Zipper
     {
         $self = $this;
         $this->repository->each(function ($fileName) use ($path, $matchingMethod, $self) {
-            $currentPath = $self->getCurrentFolderPath();
+            $currentPath = $self->getCurrentFolderWithTrailingSlash();
             if (!empty($currentPath) && !starts_with($fileName, $currentPath)) {
                 return;
             }
@@ -508,15 +536,15 @@ class Zipper
     /**
      * @param $fileName
      * @param $path
+     * @throws \RuntimeException
      */
     private function extractOneFileInternal($fileName, $path)
     {
         $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
 
         // We need to create the directory first in case it doesn't exist
-        $full_path = $path . DIRECTORY_SEPARATOR . $tmpPath;
-        $dir = substr($full_path, 0, strrpos($full_path, DIRECTORY_SEPARATOR));
-        if (!is_dir($dir) && !$this->getFileHandler()->makeDirectory($dir, 0777, true, true)) {
+        $dir = pathinfo($path . DIRECTORY_SEPARATOR . $tmpPath, PATHINFO_DIRNAME);
+        if (!$this->file->exists($dir) && !$this->file->makeDirectory($dir, $this->permissionMode, true, true)) {
             throw new \RuntimeException('Failed to create folders');
         }
 
@@ -555,5 +583,32 @@ class Zipper
         $this->repository->each($filter);
 
         return $filesList;
+    }
+
+    /**
+     * Set permission mode used to create files and folders. For details read about "mode" parameter at @link http://php.net/manual/en/function.chmod.php
+     *
+     * @param int $permissionMode
+     * @return Zipper
+     * @throws \InvalidArgumentException
+     */
+    public function setPermissionMode($permissionMode)
+    {
+        if (!is_int($permissionMode)) {
+            throw new \InvalidArgumentException('Permission mode must be integer');
+        }
+
+        $this->permissionMode = $permissionMode;
+        return $this;
+    }
+
+    /**
+     * Get permission mode used to create files and folders.
+     *
+     * @return int
+     */
+    public function getPermissionMode()
+    {
+        return $this->permissionMode;
     }
 }
