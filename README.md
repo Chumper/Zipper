@@ -170,7 +170,7 @@ Which will extract the `test.zip` into the `public` folder but **only** files/fo
 test.zip
  |- test.bat
  |- test.bat.~
- |- test.bat/
+ |- test.bat.dir/
     |- fileInSubFolder.log
 ```
 
@@ -186,6 +186,20 @@ Zipper::make('test.zip')->folder->('src')->extractMatchingRegex($path, '/\.php$/
 Example: extract all files **except** those ending with `test.php` from `src` folder and its sub folders.
 ```php
 Zipper::make('test.zip')->folder->('src')->extractMatchingRegex($path, '/^(?!.*test\.php).*$/i'); 
+```
+
+##setPermissionMode($mode)
+
+Set permission mode used to create files and folders. For details read [mode parameter info at chmod manual](http://php.net/manual/en/function.chmod.php)
+
+> default mode to create files/folder is 0755
+
+Example: extract files with 0755 mode
+```php
+Zipper::make('test.zip')
+    ->setPermissionMode(0755)
+    ->folder->('vendor')
+    ->extractTo('public');
 ```
 
 #Development

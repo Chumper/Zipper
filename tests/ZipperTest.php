@@ -24,6 +24,8 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $this->archive = new \Chumper\Zipper\Zipper(
             $this->file = Mockery::mock(new Filesystem)
         );
+        $this->file->shouldReceive('chmod')->with('foo', 0755)->andReturn(true);
+
         $this->archive->make('foo', new ArrayArchive('foo', true));
     }
 
@@ -54,6 +56,24 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $zip = new Zipper($this->file);
 
         $zip->make($path . DIRECTORY_SEPARATOR . 'createMe.zip');
+    }
+
+    public function testMakeCreatesArchiveFolderWith0775Mode()
+    {
+        $path = getcwd() . time();
+
+        $this->file->shouldReceive('exists')->andReturn(false);
+        $this->file->shouldReceive('isWritable')->andReturn(true);
+        $this->file->shouldReceive('makeDirectory')->andReturn(true);
+        $this->file->shouldReceive('chmod')->withAnyArgs()->andReturn(true);
+
+        $permissionMode = 0745;
+        $zip = (new Zipper($this->file))->setPermissionMode($permissionMode);
+
+        $filename = $path . DIRECTORY_SEPARATOR . 'createMe.zip';
+        $zip->make($filename);
+
+        $this->file->shouldHaveReceived('makeDirectory')->with($path, $permissionMode, true);
     }
 
     public function testAddAndGet()
@@ -254,6 +274,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
     public function testExtractWhiteListWithExactMatchingFromSubDirectory()
     {
         $this->file->shouldReceive('isFile')->andReturn(true);
+        $this->file->shouldReceive('exists')->andReturn(false);
         $this->file->shouldReceive('makeDirectory')->andReturn(true);
 
         $this->archive->folder('foo/bar/subDirectory')
@@ -264,12 +285,15 @@ class ZipperTest extends PHPUnit_Framework_TestCase
             ->add('baz')
             ->add('baz.log');
 
-        $this->file
-            ->shouldReceive('put')
-            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'subDirectory/bazInSubDirectory', 'foo/bar/subDirectory/bazInSubDirectory');
+        $subDirectoryPath = realpath(NULL) . DIRECTORY_SEPARATOR . 'subDirectory';
+        $subDirectoryFilePath = $subDirectoryPath . '/bazInSubDirectory';
+        $this->file->shouldReceive('put')
+            ->with($subDirectoryFilePath, 'foo/bar/subDirectory/bazInSubDirectory');
 
         $this->archive
             ->extractTo(getcwd(), array('subDirectory/bazInSubDirectory'), Zipper::WHITELIST | Zipper::EXACT_MATCH);
+
+        $this->file->shouldHaveReceived('makeDirectory')->with($subDirectoryPath, 0755, true, true);
     }
 
     public function testExtractToIgnoresBlackListFile()
@@ -482,5 +506,42 @@ class ZipperTest extends PHPUnit_Framework_TestCase
             PHPUnit_Framework_Error_Warning::$enabled = TRUE;
             throw $exception;
         }
+    }
+
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Permission mode must be integer
+     */
+    public function testSetPermissionModeWithNull()
+    {
+        $this->archive->setPermissionMode(null);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Permission mode must be integer
+     */
+    public function testSetPermissionModeWithString()
+    {
+        $this->archive->setPermissionMode('asd');
+    }
+
+    public function testSetPermissionMode()
+    {
+        $this->archive->setPermissionMode(0777);
+
+        $this->assertEquals(0777, $this->archive->getPermissionMode());
+    }
+
+    public function testSetPermissionModeDefaultValue()
+    {
+        $this->assertEquals(0755, $this->archive->getPermissionMode());
+    }
+
+    public function testSetPermissionModeDefaultValueFromConstructor()
+    {
+        $zip = (new Zipper())->setPermissionMode(0775);
+        $this->assertEquals(0775, $zip->getPermissionMode());
     }
 }
