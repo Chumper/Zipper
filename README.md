@@ -131,6 +131,9 @@ This will go into the folder `test` in the zip file and extract the content of t
 
 This command is really nice to get just a part of the zip file, you can also pass a 2nd & 3rd param to specify a single or an array of files that will be
 
+> NB: Php ZipArchive uses internally '/' as directory separator for files/folders in zip. So Windows users should not set 
+> whitelist/blacklist patterns with '\' as it will not match anything
+
 white listed
 
 >**Zipper::WHITELIST**
@@ -170,7 +173,7 @@ Which will extract the `test.zip` into the `public` folder but **only** files/fo
 test.zip
  |- test.bat
  |- test.bat.~
- |- test.bat/
+ |- test.bat.dir/
     |- fileInSubFolder.log
 ```
 
