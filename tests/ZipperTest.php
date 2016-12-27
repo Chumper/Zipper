@@ -254,6 +254,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
     public function testExtractWhiteListWithExactMatchingFromSubDirectory()
     {
         $this->file->shouldReceive('isFile')->andReturn(true);
+        $this->file->shouldReceive('exists')->andReturn(false);
         $this->file->shouldReceive('makeDirectory')->andReturn(true);
 
         $this->archive->folder('foo/bar/subDirectory')
@@ -264,12 +265,15 @@ class ZipperTest extends PHPUnit_Framework_TestCase
             ->add('baz')
             ->add('baz.log');
 
-        $this->file
-            ->shouldReceive('put')
-            ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'subDirectory/bazInSubDirectory', 'foo/bar/subDirectory/bazInSubDirectory');
+        $subDirectoryPath = realpath(NULL) . DIRECTORY_SEPARATOR . 'subDirectory';
+        $subDirectoryFilePath = $subDirectoryPath . '/bazInSubDirectory';
+        $this->file->shouldReceive('put')
+            ->with($subDirectoryFilePath, 'foo/bar/subDirectory/bazInSubDirectory');
 
         $this->archive
             ->extractTo(getcwd(), array('subDirectory/bazInSubDirectory'), Zipper::WHITELIST | Zipper::EXACT_MATCH);
+
+        $this->file->shouldHaveReceived('makeDirectory')->with($subDirectoryPath, 0755, true, true);
     }
 
     public function testExtractToIgnoresBlackListFile()
