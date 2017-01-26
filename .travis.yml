@@ -18,4 +18,4 @@ before_script:
 install:
     - travis_retry composer update --no-interaction
 
-script: phpunit
+script: vendor/bin/phpunit
