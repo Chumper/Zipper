@@ -476,15 +476,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
         $this->file->shouldReceive('isFile')->with('foo.file')->andReturn(true);
         $this->archive->add('foo.file');
 
-        PHPUnit_Framework_Error_Warning::$enabled = FALSE; // disable PhpUnit error_handler for warnings for a moment
-        try {
-            $this->assertEquals(
-                array('foo.file', 'subDir/sub.file'),
-                $this->archive->listFiles('asdasd') // invalid pattern
-            );
-        } catch (Exception $exception) {
-            PHPUnit_Framework_Error_Warning::$enabled = TRUE;
-            throw $exception;
-        }
+        $invalidPattern = 'asdasd';
+        $this->archive->listFiles($invalidPattern);
     }
 }
