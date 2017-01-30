@@ -21,7 +21,7 @@ You can now access Zipper with the `Zipper` alias.
 ##Simple example
 ```php
 $files = glob('public/files/*');
-Zipper::make('public/test.zip')->add($files);
+Zipper::make('public/test.zip')->add($files)->close();
 ```
 - by default the package will create the `test.zip` in the project route folder but in the example above we changed it to `project_route/public/`.
 
@@ -44,7 +44,11 @@ $zipper->folder('mySuperPackage')->add(
 $zipper->getFileContent('mySuperPackage/composer.json');
 
 $zipper->make('test.zip')->extractTo('',array('mySuperPackage/composer.json'),Zipper::WHITELIST);
+
+$zipper->close();
 ```
+
+Note: Please be aware that you need to call `->close()` at the end to write the zip file to disk.
 
 You can easily chain most functions, except `getFileContent`, `getStatus`, `close` and `extractTo` which must come at the end of the chain.
 
