@@ -560,13 +560,14 @@ class Zipper
         $filesList = array();
         if ($regexFilter) {
             $filter = function ($file) use (&$filesList, $regexFilter) {
+                # push/pop an error handler here to to make sure no error/exception thrown if $expected is not a regex
+                set_error_handler(function () {});
                 $match = preg_match($regexFilter, $file);
+                restore_error_handler();
+
                 if ($match === 1) {
                     $filesList[] = $file;
                 } else if ($match === FALSE) {
-                    //invalid pattern for preg_match raises E_WARNING and returns FALSE
-                    //so if you have custom error_handler set to catch and throw E_WARNINGs you never end up here
-                    //but if you have not - this will throw exception
                     throw new \RuntimeException("regular expression match on '$file' failed with error. Please check if pattern is valid regular expression.");
                 }
             };
