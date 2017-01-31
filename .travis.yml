@@ -4,16 +4,29 @@ sudo: false
 
 php:
   - 5.6
-  - 7
+  - 7.0
+  - 7.1
 
 env:
-  - COMPOSER_FLAGS=--prefer-lowest
+  global:
+    - setup=basic
 
-before_script:
-  - travis_retry composer self-update
-  - travis_retry composer update --no-interaction --prefer-source --prefer-stable ${COMPOSER_FLAGS}
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.6
+      env: setup=lowest
+    - php: 5.6
+      env: setup=stable
+
+
+before_install:
+  - composer self-update
+  - composer clear-cache
 
 install:
-    - travis_retry composer update --no-interaction
+  - if [[ $setup = 'basic' ]]; then travis_retry composer update --no-interaction --prefer-dist --no-suggest; fi
+  - if [[ $setup = 'stable' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-stable --no-suggest; fi
+  - if [[ $setup = 'lowest' ]]; then travis_retry composer update --prefer-dist --no-interaction --prefer-lowest --prefer-stable --no-suggest; fi
 
 script: vendor/bin/phpunit
