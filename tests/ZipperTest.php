@@ -1,11 +1,11 @@
 <?php
 
-use Chumper\Zipper\Zipper;
+namespace Chumper\Zipper;
+
 use Illuminate\Filesystem\Filesystem;
+use Mockery;
 
-require_once 'ArrayArchive.php';
-
-class ZipperTest extends PHPUnit_Framework_TestCase
+class ZipperTest extends \PHPUnit_Framework_TestCase
 {
 
 
@@ -21,7 +21,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->archive = new \Chumper\Zipper\Zipper(
+        $this->archive = new Zipper(
             $this->file = Mockery::mock(new Filesystem)
         );
         $this->archive->make('foo', new ArrayArchive('foo', true));
@@ -34,7 +34,7 @@ class ZipperTest extends PHPUnit_Framework_TestCase
 
     public function testMake()
     {
-        $this->assertEquals('ArrayArchive', $this->archive->getArchiveType());
+        $this->assertEquals('Chumper\\Zipper\\ArrayArchive', $this->archive->getArchiveType());
         $this->assertEquals('foo', $this->archive->getFilePath());
     }
 
