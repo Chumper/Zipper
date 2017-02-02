@@ -1,5 +1,10 @@
 <?php
-use Chumper\Zipper\Repositories\ZipRepository;
+
+namespace Chumper\Zipper\Repositories;
+
+use Mockery;
+use ZipArchive;
+use Exception;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -9,7 +14,7 @@ use Chumper\Zipper\Repositories\ZipRepository;
  * To change this template use File | Settings | File Templates.
  */
 
-class ZipRepositoryTest extends PHPUnit_Framework_TestCase
+class ZipRepositoryTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -49,7 +54,7 @@ class ZipRepositoryTest extends PHPUnit_Framework_TestCase
      */
     public function testOpenNonZipThrowsException()
     {
-        new ZipRepository( __DIR__ . DIRECTORY_SEPARATOR . 'ZipRepositoryTest.php', false);
+        new ZipRepository(__DIR__ . DIRECTORY_SEPARATOR . 'ZipRepositoryTest.php', false);
     }
 
     public function testAddFile()

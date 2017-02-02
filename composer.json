@@ -27,6 +27,11 @@
             "Chumper\\Zipper\\": "src/Chumper/Zipper"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Chumper\\Zipper\\": "tests/"
+        }
+    },
     "config": {
         "sort-packages": true
     },

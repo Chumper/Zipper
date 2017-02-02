@@ -1,5 +1,7 @@
 <?php
 
+namespace Chumper\Zipper;
+
 use Chumper\Zipper\Repositories\RepositoryInterface;
 
 class ArrayArchive implements RepositoryInterface
