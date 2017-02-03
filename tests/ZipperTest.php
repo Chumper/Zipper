@@ -4,6 +4,9 @@ namespace Chumper\Zipper;
 
 use Illuminate\Filesystem\Filesystem;
 use Mockery;
+use RuntimeException;
+use InvalidArgumentException;
+use Exception;
 
 class ZipperTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,9 +24,8 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->archive = new Zipper(
-            $this->file = Mockery::mock(new Filesystem)
-        );
+        $this->file = Mockery::mock(new Filesystem);
+        $this->archive = new Zipper($this->file);
         $this->archive->make('foo', new ArrayArchive('foo', true));
     }
 
@@ -38,11 +40,6 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $this->archive->getFilePath());
     }
 
-
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Failed to create folder
-     */
     public function testMakeThrowsExceptionWhenCouldNotCreateDirectory()
     {
         $path = getcwd() . time();
@@ -52,6 +49,9 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
             ->andReturn(false);
 
         $zip = new Zipper($this->file);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to create folder');
 
         $zip->make($path . DIRECTORY_SEPARATOR . 'createMe.zip');
     }
@@ -118,11 +118,11 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    /**
-     * @expectedException Exception
-     */
     public function testGetFileContent()
     {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('The file "baz" cannot be found');
+
         $this->archive->getFileContent('baz');
     }
 
@@ -185,10 +185,6 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
             ->extractTo(getcwd(), array('foo'), Zipper::WHITELIST);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Failed to create folder
-     */
     public function testExtractToThrowsExceptionWhenCouldNotCreateDirectory()
     {
         $path = getcwd() . time();
@@ -206,6 +202,9 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
 
         $this->file->shouldNotReceive('put')
             ->with(realpath(NULL) . DIRECTORY_SEPARATOR . 'foo.log', 'foo.log');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Failed to create folder');
 
         $this->archive
             ->extractTo($path, array('foo'), Zipper::WHITELIST);
@@ -366,12 +365,10 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
         $this->archive->extractMatchingRegex(getcwd(), '/\.log$/i');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Missing pass valid regex parameter
-     */
     public function testExtractMatchingRegexThrowsExceptionWhenRegexIsEmpty()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing pass valid regex parameter');
         $this->archive->extractMatchingRegex(getcwd(), '');
     }
 
@@ -467,14 +464,13 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage regular expression match on 'foo.file' failed with error. Please check if pattern is valid regular expression.
-     */
     public function testListFilesThrowsExceptionWithInvalidRegexFilter()
     {
         $this->file->shouldReceive('isFile')->with('foo.file')->andReturn(true);
         $this->archive->add('foo.file');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('regular expression match on \'foo.file\' failed with error. Please check if pattern is valid regular expression.');
 
         $invalidPattern = 'asdasd';
         $this->archive->listFiles($invalidPattern);
