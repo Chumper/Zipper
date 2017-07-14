@@ -84,6 +84,23 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $this->archive->getFileContent('foo'));
         $this->assertSame('foo.bar', $this->archive->getFileContent('foo.bar'));
     }
+    
+    public function testAddAndGetWithCustomFilenameArray()
+    {
+        $this->file->shouldReceive('isFile')->with('foo.bar')
+            ->times(1)->andReturn(true);
+        $this->file->shouldReceive('isFile')->with('foo')
+            ->times(1)->andReturn(true);
+
+        /**Array**/
+        $this->archive->add([
+            'custom.bar' => 'foo.bar',
+            'custom' => 'foo',
+        ]);
+
+        $this->assertSame('custom', $this->archive->getFileContent('custom'));
+        $this->assertSame('custom.bar', $this->archive->getFileContent('custom.bar'));
+    }
 
     public function testAddAndGetWithSubFolder()
     {

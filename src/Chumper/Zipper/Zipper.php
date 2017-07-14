@@ -246,8 +246,12 @@ class Zipper
     public function add($pathToAdd, $fileName = null)
     {
         if (is_array($pathToAdd)) {
-            foreach ($pathToAdd as $dir) {
-                $this->add($dir);
+            foreach ($pathToAdd as $key=>$dir) {
+                if (!is_int($key)) {
+                    $this->add($dir, $key); }
+                else {
+                    $this->add($dir);
+                }
             }
         } elseif ($this->file->isFile($pathToAdd)) {
             if ($fileName) {
