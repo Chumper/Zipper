@@ -35,6 +35,16 @@
     "config": {
         "sort-packages": true
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Chumper\\Zipper\\ZipperServiceProvider"
+            ],
+            "aliases": {
+                "Zipper": "Chumper\\Zipper\\Zipper"
+            }
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
