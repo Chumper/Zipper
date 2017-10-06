@@ -40,7 +40,7 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
 
     public function testMakeThrowsExceptionWhenCouldNotCreateDirectory()
     {
-        $path = getcwd().time();
+        $path = \getcwd().\time();
 
         $this->file->shouldReceive('makeDirectory')
             ->with($path, 0755, true)
@@ -84,7 +84,7 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', $this->archive->getFileContent('foo'));
         $this->assertSame('foo.bar', $this->archive->getFileContent('foo.bar'));
     }
-    
+
     public function testAddAndGetWithCustomFilenameArray()
     {
         $this->file->shouldReceive('isFile')->with('foo.bar')
@@ -187,19 +187,19 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(null).DIRECTORY_SEPARATOR.'foo', 'foo');
+            ->with(\realpath(null).DIRECTORY_SEPARATOR.'foo', 'foo');
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(null).DIRECTORY_SEPARATOR.'foo.log', 'foo.log');
+            ->with(\realpath(null).DIRECTORY_SEPARATOR.'foo.log', 'foo.log');
 
         $this->archive
-            ->extractTo(getcwd(), ['foo'], Zipper::WHITELIST);
+            ->extractTo(\getcwd(), ['foo'], Zipper::WHITELIST);
     }
 
     public function testExtractToThrowsExceptionWhenCouldNotCreateDirectory()
     {
-        $path = getcwd().time();
+        $path = \getcwd().\time();
 
         $this->file
             ->shouldReceive('isFile')
@@ -213,7 +213,7 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
         $this->archive->add('foo.log');
 
         $this->file->shouldNotReceive('put')
-            ->with(realpath(null).DIRECTORY_SEPARATOR.'foo.log', 'foo.log');
+            ->with(\realpath(null).DIRECTORY_SEPARATOR.'foo.log', 'foo.log');
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Failed to create folder');
@@ -234,14 +234,14 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(null).DIRECTORY_SEPARATOR.'baz', 'foo/bar/baz');
+            ->with(\realpath(null).DIRECTORY_SEPARATOR.'baz', 'foo/bar/baz');
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(null).DIRECTORY_SEPARATOR.'baz.log', 'foo/bar/baz.log');
+            ->with(\realpath(null).DIRECTORY_SEPARATOR.'baz.log', 'foo/bar/baz.log');
 
         $this->archive
-            ->extractTo(getcwd(), ['baz'], Zipper::WHITELIST);
+            ->extractTo(\getcwd(), ['baz'], Zipper::WHITELIST);
     }
 
     public function testExtractWhiteListWithExactMatching()
@@ -256,10 +256,10 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
 
         $this->file
             ->shouldReceive('put')
-            ->with(realpath(null).DIRECTORY_SEPARATOR.'baz', 'foo/bar/baz');
+            ->with(\realpath(null).DIRECTORY_SEPARATOR.'baz', 'foo/bar/baz');
 
         $this->archive
-            ->extractTo(getcwd(), ['baz'], Zipper::WHITELIST | Zipper::EXACT_MATCH);
+            ->extractTo(\getcwd(), ['baz'], Zipper::WHITELIST | Zipper::EXACT_MATCH);
     }
 
     public function testExtractWhiteListWithExactMatchingFromSubDirectory()
@@ -276,13 +276,13 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
             ->add('baz')
             ->add('baz.log');
 
-        $subDirectoryPath = realpath(null).DIRECTORY_SEPARATOR.'subDirectory';
+        $subDirectoryPath = \realpath(null).DIRECTORY_SEPARATOR.'subDirectory';
         $subDirectoryFilePath = $subDirectoryPath.'/bazInSubDirectory';
         $this->file->shouldReceive('put')
             ->with($subDirectoryFilePath, 'foo/bar/subDirectory/bazInSubDirectory');
 
         $this->archive
-            ->extractTo(getcwd(), ['subDirectory/bazInSubDirectory'], Zipper::WHITELIST | Zipper::EXACT_MATCH);
+            ->extractTo(\getcwd(), ['subDirectory/bazInSubDirectory'], Zipper::WHITELIST | Zipper::EXACT_MATCH);
 
         $this->file->shouldHaveReceived('makeDirectory')->with($subDirectoryPath, 0755, true, true);
     }
@@ -298,15 +298,15 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
         $this->archive->add('foo')
             ->add('bar');
 
-        $this->file->shouldReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'foo', 'foo');
-        $this->file->shouldNotReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'bar', 'bar');
+        $this->file->shouldReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'foo', 'foo');
+        $this->file->shouldNotReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'bar', 'bar');
 
-        $this->archive->extractTo(getcwd(), ['bar'], Zipper::BLACKLIST);
+        $this->archive->extractTo(\getcwd(), ['bar'], Zipper::BLACKLIST);
     }
 
     public function testExtractBlackListFromSubDirectory()
     {
-        $currentDir = getcwd();
+        $currentDir = \getcwd();
 
         $this->file->shouldReceive('isFile')->andReturn(true);
         $this->file->shouldReceive('makeDirectory')->andReturn(true);
@@ -342,9 +342,9 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
             ->add('baz')
             ->add('baz.log');
 
-        $this->file->shouldReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'baz.log', 'foo/bar/baz.log');
+        $this->file->shouldReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'baz.log', 'foo/bar/baz.log');
 
-        $this->archive->extractTo(getcwd(), ['baz'], Zipper::BLACKLIST | Zipper::EXACT_MATCH);
+        $this->archive->extractTo(\getcwd(), ['baz'], Zipper::BLACKLIST | Zipper::EXACT_MATCH);
     }
 
     public function testExtractMatchingRegexFromSubFolder()
@@ -367,20 +367,20 @@ class ZipperTest extends \PHPUnit_Framework_TestCase
             ->add('baz')
             ->add('baz.log');
 
-        $this->file->shouldReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'baz.log', 'foo/bar/baz.log');
-        $this->file->shouldReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'subFolder/subFolderFileToExtract.log', 'foo/bar/subFolder/subFolderFileToExtract.log');
-        $this->file->shouldNotReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'rootLevelMustBeIgnored.log', 'rootLevelMustBeIgnored.log');
-        $this->file->shouldNotReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'baz', 'foo/bar/baz');
-        $this->file->shouldNotReceive('put')->with(realpath(null).DIRECTORY_SEPARATOR.'subFolder/subFolderFileToIgnore', 'foo/bar/subFolder/subFolderFileToIgnore');
+        $this->file->shouldReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'baz.log', 'foo/bar/baz.log');
+        $this->file->shouldReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'subFolder/subFolderFileToExtract.log', 'foo/bar/subFolder/subFolderFileToExtract.log');
+        $this->file->shouldNotReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'rootLevelMustBeIgnored.log', 'rootLevelMustBeIgnored.log');
+        $this->file->shouldNotReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'baz', 'foo/bar/baz');
+        $this->file->shouldNotReceive('put')->with(\realpath(null).DIRECTORY_SEPARATOR.'subFolder/subFolderFileToIgnore', 'foo/bar/subFolder/subFolderFileToIgnore');
 
-        $this->archive->extractMatchingRegex(getcwd(), '/\.log$/i');
+        $this->archive->extractMatchingRegex(\getcwd(), '/\.log$/i');
     }
 
     public function testExtractMatchingRegexThrowsExceptionWhenRegexIsEmpty()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing pass valid regex parameter');
-        $this->archive->extractMatchingRegex(getcwd(), '');
+        $this->archive->extractMatchingRegex(\getcwd(), '');
     }
 
     public function testNavigationFolderAndHome()

@@ -16,20 +16,20 @@ class ZipRepository implements RepositoryInterface
      * @param bool $create
      * @param $archive
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return ZipRepository
      */
     public function __construct($filePath, $create = false, $archive = null)
     {
         //Check if ZipArchive is available
-        if (!class_exists('ZipArchive')) {
+        if (!\class_exists('ZipArchive')) {
             throw new Exception('Error: Your PHP version is not compiled with zip support');
         }
         $this->archive = $archive ? $archive : new ZipArchive();
 
         $res = $this->archive->open($filePath, ($create ? ZipArchive::CREATE : null));
-        if ($res !== true) {
+        if (true !== $res) {
             throw new Exception("Error: Failed to open $filePath! Error: ".$this->getErrorMessage($res));
         }
     }
@@ -111,10 +111,10 @@ class ZipRepository implements RepositoryInterface
         for ($i = 0; $i < $this->archive->numFiles; ++$i) {
             //skip if folder
             $stats = $this->archive->statIndex($i);
-            if ($stats['size'] === 0 && $stats['crc'] === 0) {
+            if (0 === $stats['size'] && 0 === $stats['crc']) {
                 continue;
             }
-            call_user_func_array($callback, [
+            \call_user_func_array($callback, [
                 'file' => $this->archive->getNameIndex($i),
             ]);
         }
@@ -129,7 +129,7 @@ class ZipRepository implements RepositoryInterface
      */
     public function fileExists($fileInArchive)
     {
-        return $this->archive->locateName($fileInArchive) !== false;
+        return false !== $this->archive->locateName($fileInArchive);
     }
 
     /**
