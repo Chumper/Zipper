@@ -84,7 +84,7 @@ class ArrayArchive implements RepositoryInterface
     public function each($callback)
     {
         foreach ($this->entries as $entry) {
-            call_user_func_array($callback, [
+            \call_user_func_array($callback, [
                 'file' => $entry,
             ]);
         }
@@ -99,7 +99,7 @@ class ArrayArchive implements RepositoryInterface
      */
     public function fileExists($fileInArchive)
     {
-        return array_key_exists($fileInArchive, $this->entries);
+        return \array_key_exists($fileInArchive, $this->entries);
     }
 
     /**

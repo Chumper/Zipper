@@ -26,6 +26,10 @@ return PhpCsFixer\Config::create()
         'no_php4_constructor' => true,
         'no_short_echo_tag' => true,
         'phpdoc_summary' => false,
+        'native_function_invocation' => true,
+        'no_php4_constructor' => true,
+        'no_superfluous_elseif' => true,
+        'no_null_property_initialization' => true,
     ))
     ->setFinder(
         PhpCsFixer\Finder::create()
