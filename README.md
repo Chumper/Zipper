@@ -13,8 +13,8 @@ This is a simple Wrapper around the ZipArchive methods with some handy functions
 
 3. Go to `app/config/app.php`
 
-  * add to providers `'Chumper\Zipper\ZipperServiceProvider'`
-  * add to aliases `'Zipper' => 'Chumper\Zipper\Zipper'`
+  * add to providers `Chumper\Zipper\ZipperServiceProvider::class`
+  * add to aliases `'Zipper' => Chumper\Zipper\Zipper::class`
 
 You can now access Zipper with the `Zipper` alias.
 
