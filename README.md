@@ -82,9 +82,10 @@ removes a single file or an array of files from the zip.
 
 Specify a folder to 'add files to' or 'remove files from' from the zip, example
 
-	Zipper::make('test.zip')->folder('test')->add('composer.json');
-	Zipper::make('test.zip')->folder('test')->remove('composer.json');
-
+```php
+Zipper::make('test.zip')->folder('test')->add('composer.json');
+Zipper::make('test.zip')->folder('test')->remove('composer.json');
+```
 
 ## listFiles($regexFilter = null)
 
@@ -129,7 +130,9 @@ closes the zip and writes all changes.
 
 Extracts the content of the zip archive to the specified location, for example
 
-    Zipper::make('test.zip')->folder('test')->extractTo('foo');
+```php
+Zipper::make('test.zip')->folder('test')->extractTo('foo');
+```
 
 This will go into the folder `test` in the zip file and extract the content of that folder only to the folder `foo`, this is equal to using the `Zipper::WHITELIST`.
 
