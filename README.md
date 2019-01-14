@@ -65,12 +65,12 @@ It will return the Zipper instance so you can chain easily.
 
 ## add($files/folder)
 
-You can add and array of Files, or a Folder which all the files in that folder will then be added, so from the first example we could instead do something like `$files = 'public/files/';`.
+You can add an array of Files, or a Folder and all the files in that folder will then be added, so from the first example we could instead do something like `$files = 'public/files/';`.
 
 
 ## addString($filename, $content)
 
-add a single file to the zip by specifying a name and content as strings.
+add a single file to the zip by specifying a name and the content as strings.
 
 
 ## remove($file/s)
