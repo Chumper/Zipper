@@ -84,21 +84,27 @@ class Zipper
     public function make($pathToFile, $type = 'zip')
     {
         $new = $this->createArchiveFile($pathToFile);
-        $this->filePath = $pathToFile;
 
         $objectOrName = $type;
         if (is_string($type)) {
-            $objectOrName = 'Chumper\Zipper\Repositories\\'.ucwords($type).'Repository';
+            $objectOrName = 'Chumper\Zipper\Repositories\\' . ucwords($type) . 'Repository';
         }
 
         if (!is_subclass_of($objectOrName, 'Chumper\Zipper\Repositories\RepositoryInterface')) {
             throw new \InvalidArgumentException("Class for '{$objectOrName}' must implement RepositoryInterface interface");
         }
 
-        $this->repository = $type;
-        if (is_string($objectOrName)) {
-            $this->repository = new $objectOrName($pathToFile, $new);
+        try {
+            if (is_string($objectOrName)) {
+                $this->repository = new $objectOrName($pathToFile, $new);
+            } else {
+                $this->repository = $type;
+            }
+        } catch(Exception $e) {
+            throw $e;
         }
+
+        $this->filePath = $pathToFile;
 
         return $this;
     }
