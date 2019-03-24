@@ -561,9 +561,8 @@ class Zipper
      */
     private function addFile($pathToAdd, $fileName = null)
     {
-        $info = pathinfo($pathToAdd);
-
         if (!$fileName) {
+            $info = pathinfo($pathToAdd);
             $fileName = isset($info['extension']) ?
                 $info['filename'].'.'.$info['extension'] :
                 $info['filename'];
