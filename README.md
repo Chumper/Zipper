@@ -190,12 +190,12 @@ Extracts the content of the zip archive matching regular expression to the speci
 
 Example: extract all files ending with `.php` from `src` folder and its sub folders.
 ```php
-Zipper::make('test.zip')->folder->('src')->extractMatchingRegex($path, '/\.php$/i'); 
+Zipper::make('test.zip')->folder('src')->extractMatchingRegex($path, '/\.php$/i'); 
 ```
 
 Example: extract all files **except** those ending with `test.php` from `src` folder and its sub folders.
 ```php
-Zipper::make('test.zip')->folder->('src')->extractMatchingRegex($path, '/^(?!.*test\.php).*$/i'); 
+Zipper::make('test.zip')->folder('src')->extractMatchingRegex($path, '/^(?!.*test\.php).*$/i'); 
 ```
 
 # Development
