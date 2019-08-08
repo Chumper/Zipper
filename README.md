@@ -1,3 +1,10 @@
+# Note
+
+I haven't updated this package in a long time except merging PRs. The last time I was using this package was with PHP5.
+I archived the repository for the reason that I am no longer working with PHP (we all have to move on sometimes) and have no time to take proper care of it anymore.
+
+Feel free to read the code, to fork it or to use it in whatever way you want.
+
 # Zipper
 
 [![Build Status](https://travis-ci.org/Chumper/Zipper.png)](https://travis-ci.org/Chumper/Zipper)
