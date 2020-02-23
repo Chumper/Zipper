@@ -613,6 +613,11 @@ class Zipper
     private function extractOneFileInternal($fileName, $path)
     {
         $tmpPath = str_replace($this->getInternalPath(), '', $fileName);
+        
+        //Prevent Zip traversal attacks
+        if (strpos($fileName, '../') !== false || strpos($fileName, '..\\') !== false) {
+            throw new \RuntimeException('Special characters found within filenames');
+        }
 
         // We need to create the directory first in case it doesn't exist
         $dir = pathinfo($path.DIRECTORY_SEPARATOR.$tmpPath, PATHINFO_DIRNAME);
