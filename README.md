@@ -5,6 +5,12 @@ I archived the repository for the reason that I am no longer working with PHP (w
 
 Feel free to read the code, to fork it or to use it in whatever way you want.
 
+## Update 25th February 2020
+
+I have merged a PR that includes a security fixe to mitigate zip directory traversal attacks. \
+**This package is still archived and should be swapped out with another package.** \
+However, as long as security fixes will come in I see it as my basic obligation to update this package on demand.
+
 # Zipper
 
 [![Build Status](https://travis-ci.org/Chumper/Zipper.png)](https://travis-ci.org/Chumper/Zipper)
